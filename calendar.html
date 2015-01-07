@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <title>Jquery Calendar</title>
+    <meta http-equiv="content-type" charset="utf-8" content="text/html">
+    <link rel="stylesheet" href="calendar.css">
+    <script type="text/javascript" src="jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="calendar.js"></script>
+</head>
+<body>
+<div id="yearlyView"></div>
+<br/>
+
+<div id="monthlyView"></div>
+<script type="text/javascript">
+    $(function () {
+        $('#yearlyView').calendar();
+        $('#yearlyView').calendar('yearView');
+
+        $('#yearlyView').calendar('extendLocal', '...', {
+            foo: function () {
+                console.log('foo');
+                return 123;
+            }
+        });
+
+        var r = $('#yearlyView').calendar('foo');
+        console.log(r);
+
+        $('#monthlyView').calendar();
+        $('#monthlyView').calendar('monthView');
+        $('#monthlyView').calendar('foo');
+    });
+</script>
+</body>
+</html>
