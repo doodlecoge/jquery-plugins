@@ -1,3 +1,16 @@
+.cal button {
+    display: inline;
+    border: 1px solid #eee;
+    padding: 0;
+    margin: 0 5px 5px 0;
+    background: transparent;
+    outline: none;
+    padding: 2px 10px;
+    border-radius: 5px;
+    background: #ccc;
+    cursor: pointer;
+}
+
 table.ycal {
     table-layout: fixed;
     border-collapse: collapse;
@@ -21,7 +34,7 @@ table.ycal td.title {
 
 table.ycal table td {
     width: 30px;
-    height: 30px;
+    height: 20px;
     overflow: hidden;
     border: 2px solid #fff;
     background: #ccc;
@@ -46,9 +59,7 @@ table.ycal table td.sel {
     border-bottom: 2px solid #69c;
 }
 
-
-
-/*******************************************************************/
+/*****************************************************************************/
 
 table.mcal {
     table-layout: fixed;
@@ -58,14 +69,14 @@ table.mcal {
 }
 
 table.mcal th {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     padding: 10px 0;
     background: #69c;
 
 }
 
 table.mcal td {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     padding: 0;
     height: 60px;
     vertical-align: top;
@@ -85,10 +96,53 @@ table.mcal td.not-this-month {
 .txt {
     padding: 0 20px;
 }
+
 .btn {
     padding: 0px 5px;
     cursor: pointer;
 }
+
 .btn:hover {
     background: #ccc;
+}
+
+/*****************************************************************************/
+.dcal {
+    border: 1px solid #69c;
+    border-bottom: 0;
+}
+
+.dcal .leftcol {
+    width: 100px;
+    float: left;
+}
+
+.dcal .leftcol .hour {
+    height: 63px;
+    text-align: center;
+    border-bottom: 1px solid #69c;
+    border-right: 1px solid #69c;
+}
+
+.dcal .rightcol {
+    margin-left: 100px;
+    position: relative;
+}
+
+.dcal .rightcol .quarter {
+    border-bottom: 1px dashed #ccc;
+    height: 15px;
+}
+.dcal .rightcol .quarter:hover {
+    background: #eee;
+}
+.dcal .rightcol .quarter.last {
+    border-bottom: 1px solid #69c;
+    height: 15px;
+}
+.dcal .apmt {
+    position: absolute;
+    background: #69c;
+    border: 1px solid #000;
+    box-sizing: border-box;
 }

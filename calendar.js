@@ -86,16 +86,96 @@
         }
     }
 
+    plugin('dialog', {});
 
+    /*=======================================================================*/
+    /* calendar                                                              */
+    /*=======================================================================*/
     plugin('calendar', {
         dayMs: 86400000,
         l10n: {
             weekNames: '日,一,二,三,四,五,六'.split(',')
         },
         _create: function () {
+            this._createWrapper();
+            this.dailyView();
+        },
+        _createWrapper: function () {
+            this.wrapper = $('<div>').addClass('cal').appendTo(this.element);
+            this.legend = $('<div>').addClass('legend').appendTo(this.wrapper);
+            this._createLegendButtons();
+            this.content = $('<div>').addClass('content').appendTo(this.wrapper);
+        },
+        _createLegendButtons: function () {
+            var year = $('<button>').appendTo(this.legend).html('年');
+            this._on(year, {
+                click: function (e) {
+                    this.content.html('');
+                    this._yearlyView().appendTo(this.content);
+                    this.viewType = 'yearly';
+                }
+            });
+            var month = $('<button>').appendTo(this.legend).html('月');
+            this._on(month, {
+                click: function (e) {
+                    this.content.html('');
+                    this._monthlyView().appendTo(this.content);
+                    this.viewType = 'monthly';
+                }
+            });
+            var week = $('<button>').appendTo(this.legend).html('周');
+            var day = $('<button>').appendTo(this.legend).html('日');
+            this._on(day, {
+                click: this.dailyView
+            });
+        },
+        dailyView: function (datetime) {
+            this.viewType = 'daily';
+            this.content.html('');
+            this._dailyView(datetime).appendTo(this.content);
+            this._showDailyAppointments();
+        },
+        _dailyView: function (datetime) {
+            var div = $('<div>').addClass('dcal');
+            var l = $('<div>').addClass('leftcol').appendTo(div);
+            var r = $('<div>').addClass('rightcol').appendTo(div);
+
+            for (var i = 0; i < 24; i++) {
+                $('<div>').addClass('hour').html(this._pad0(i) + ':00').appendTo(l);
+                for (var j = 0; j < 4; j++) {
+                    var d = $('<div>').addClass('quarter').appendTo(r);
+                    if (j == 3) d.addClass('last');
+                }
+            }
+            return div;
+        },
+        _showDailyAppointments: function (datetime) {
+            datetime = datetime || new Date();
+
+            var arr = [];
+            $.each(this._appointments(), function (i, apmt) {
+                var s = new Date(apmt.start);
+                var e = new Date(apmt.end);
+                var days = Math.floor((datetime - 0) / this.dayMs);
+
+                console.log(days);
+
+                if (days !== Math.floor((s - 0) / this.dayMs) ||
+                    days !== Math.floor((e - 0) / this.dayMs)) return;
+                arr.push(apmt);
+            });
+
+            arr.sort(function (x, y) {
+                return x.start > y.start;
+            });
+
+            console.log(arr);
 
         },
-        monthView: function (datetime) {
+        monthlyView: function (datetime) {
+
+        },
+        _monthlyView: function (datetime) {
             var now = datetime || new Date();
             var date = new Date(now);
 
@@ -104,29 +184,14 @@
 
             // date of first cell
             date = new Date(date - date.getDay() * this.dayMs);
-            var tbl = $('<table>').addClass('mcal').appendTo(this.element), tr, td;
+            var tbl = $('<table>').addClass('mcal'), tr, td;
             tr = $('<tr>').appendTo(tbl);
-            td = $('<td>')
-                .attr('colspan', 7)
-                .addClass('title')
-                .appendTo(tr);
+            td = $('<td>').attr('colspan', 7).addClass('title').appendTo(tr);
 
-            $('<span>')
-                .addClass('btn')
-                .addClass('prev')
-                .html('<')
-                .appendTo(td);
-
-            $('<span>')
-                .addClass('txt')
-                .html(now.getFullYear() + '/' + this._pad0(now.getMonth() + 1))
-                .appendTo(td);
-
-            $('<span>')
-                .addClass('btn')
-                .addClass('next')
-                .html('>')
-                .appendTo(td);
+            var t = now.getFullYear() + '/' + this._pad0(now.getMonth() + 1);
+            $('<span>').addClass('btn').addClass('prev').html('<').appendTo(td);
+            $('<span>').addClass('txt').html(t).appendTo(td);
+            $('<span>').addClass('btn').addClass('next').html('>').appendTo(td);
 
             tr = $('<tr>').appendTo(tbl);
             for (var i = 0; i < 7; i++) $('<th>').html(this.l10n.weekNames[i]).appendTo(tr);
@@ -138,14 +203,18 @@
                 td = $('<td>').html(this._pad0(d.getDate())).appendTo(tr);
                 if (now.getMonth() != d.getMonth()) td.addClass('not-this-month');
             }
+
+            return tbl;
         },
-        yearView: function (year) {
+        _showMonthlyAppointments: function (datetime) {
+
+        },
+        _yearlyView: function (year) {
             year = year || new Date().getFullYear();
             var now = new Date();
             now.setFullYear(year);
             now.setMonth(-1);
-
-            var tbl = $('<table>').addClass('ycal').appendTo(this.element), tr, td;
+            var tbl = $('<table>').addClass('ycal'), tr, td;
             tr = $('<tr>').appendTo(tbl);
             $('<td>').addClass('title').attr('colspan', 4).html(year).appendTo(tr);
             for (var i = 0; i < 12; i++) {
@@ -154,6 +223,7 @@
                 now.setMonth(now.getMonth() + 1);
                 this._yearMonth(new Date(now)).appendTo(td);
             }
+            return tbl;
         },
         _yearMonth: function (datetime) {
             var current = new Date();
@@ -179,7 +249,8 @@
                     td.addClass('cur');
             }
             return tbl;
-        }, _pad0: function (num, width) {
+        },
+        _pad0: function (num, width) {
             width = width || 2;
             num = num.toString();
             var len = Math.max(0, width - num.length);
@@ -187,6 +258,9 @@
                 num = '0' + num;
             }
             return num;
+        },
+        _appointments: function () {
+            return this.options.appointments || [];
         }
     });
 
