@@ -22,7 +22,7 @@
                 getSchedulesByDate: function (date, callback) {
                     var schedules = [
                         {
-                            start: '2015/01/08 09:00',
+                            start: '2015/01/08 05:00',
                             end: '2015/01/09 10:30',
                             subject: 'Security framework 1'
                         },
@@ -93,10 +93,10 @@
                             subject: 'DB Design and Dao5=333=='
                         }
                     ];
-                    setTimeout(function () {
-                        callback(null, schedules);
-                    }, 1000);
-//                    return schedules;
+//                    setTimeout(function () {
+//                        callback(null, schedules);
+//                    }, 1000);
+                    return schedules;
                 }
             }
         });

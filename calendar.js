@@ -192,6 +192,17 @@
                     this.dailyView(d);
                 }
             });
+
+            this._on(this.element.find('.cal'), {
+                click: function(e) {
+                    var el = $(e.target);
+                    if(el.hasClass('quarter')) {
+                        console.log(el.index());
+                    } else if(el.hasClass('apmt') || el.hasClass('span-apmt')){
+                        console.log(el.html());
+                    }
+                }
+            })
         },
         _showDailyAppointments: function (datetime, schedules) {
             datetime = datetime || new Date();
