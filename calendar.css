@@ -144,5 +144,6 @@ table.mcal td.not-this-month {
     position: absolute;
     background: #69c;
     border: 1px solid #000;
-    box-sizing: border-box;
+    /*box-sizing: border-box;*/
+    opacity: 0.8;
 }

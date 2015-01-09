@@ -151,17 +151,16 @@
         },
         _showDailyAppointments: function (datetime) {
             datetime = datetime || new Date();
+            var that = this;
 
             var arr = [];
             $.each(this._appointments(), function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
-                var days = Math.floor((datetime - 0) / this.dayMs);
-
-                console.log(days);
-
-                if (days !== Math.floor((s - 0) / this.dayMs) ||
-                    days !== Math.floor((e - 0) / this.dayMs)) return;
+                var days = Math.floor((datetime - 0) / that.dayMs);
+                var day0 = Math.floor((s - 0) / that.dayMs);
+                var day1 = Math.floor((e - 0) / that.dayMs);
+                if (days !== day0 || days !== day1) return;
                 arr.push(apmt);
             });
 
@@ -169,8 +168,44 @@
                 return x.start > y.start;
             });
 
-            console.log(arr);
-
+            var pos = [0];
+            $.each(arr, function (i, apmt) {
+                if (i == 0) return;
+                var p = 0;
+                for (var j = 0; j < i; j++) {
+                    var t = arr[i - j - 1];
+                    if (t.end <= apmt.start) continue;
+                    p = pos[i - j - 1] + 1;
+                    break;
+                }
+                pos.push(p);
+            });
+            $.each(arr, function (i, apmt) {
+                var s = new Date(apmt.start);
+                var e = new Date(apmt.end);
+                var total = 24 * 60;
+                var cols = getWidth(pos, i);
+                var smins = s.getHours() * 60 + s.getMinutes();
+                var emins = e.getHours() * 60 + e.getMinutes();
+                var top = 100 * smins / total;
+                var left = 90 / cols * pos[i];
+                var height = 100 * (emins - smins) / total;
+                var width = 90 / cols;
+                $('<div>').addClass('apmt')
+                    .css('top', top + '%')
+                    .css('left', left + '%')
+                    .css('height', height + '%')
+                    .css('width', width + '%')
+                    //.css('margin-left', (-pos[i]) + 'px')
+                    .html(apmt.subject)
+                    .appendTo(that.content.find('.rightcol'));
+            });
+            function getWidth(pos, i) {
+                for (; i < pos.length - 1; i++) {
+                    if (pos[i + 1] == 0)break;
+                }
+                return pos[i] + 1;
+            }
         },
         monthlyView: function (datetime) {
 
