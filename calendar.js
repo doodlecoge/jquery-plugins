@@ -126,20 +126,40 @@
             var week = $('<button>').appendTo(this.legend).html('周');
             var day = $('<button>').appendTo(this.legend).html('日');
             this._on(day, {
-                click: this.dailyView
+                click: function (e) {
+                    this.dailyView();
+                }
             });
         },
         dailyView: function (datetime) {
-            this.viewType = 'daily';
-            this.content.html('');
-            this._dailyView(datetime).appendTo(this.content);
-            this._showDailyAppointments();
+            var that = this;
+            var t = setTimeout(function () {
+                that.content.html('努力加载“' + that._dateString(datetime) + '”的数据中...');
+            }, 100);
+            datetime = datetime || new Date();
+            var called = false;
+            var schedules = this._getSchedulesByDate(datetime, function (err, schedules) {
+                if (called) return;
+                called = true;
+                foo(err, schedules);
+            });
+            if (!called && schedules) {
+                foo(null, schedules);
+            }
+            function foo(err, schedules) {
+                clearTimeout(t);
+                that.viewType = 'daily';
+                that.content.html('');
+                that._dailyView(datetime).appendTo(that.content);
+                that._showDailyAppointments(datetime, schedules);
+            }
         },
         _dailyView: function (datetime) {
+            datetime = datetime || new Date();
             var div = $('<div>').addClass('dcal');
+            var title = $('<div>').addClass('title').html(this._dateString(datetime)).appendTo(div);
             var t = $('<div>').addClass('top').appendTo(div);
-            var span = $('<div>').addClass('span').appendTo(t);
-            //$('<div>').addClass('btn').appendTo(span);
+            $('<div>').addClass('span').appendTo(t);
             var l = $('<div>').addClass('leftcol').appendTo(div);
             var r = $('<div>').addClass('rightcol').appendTo(div);
             for (var i = 0; i < 24; i++) {
@@ -151,12 +171,12 @@
             }
             return div;
         },
-        _showDailyAppointments: function (datetime) {
+        _showDailyAppointments: function (datetime, schedules) {
             datetime = datetime || new Date();
             var that = this;
             var dailyApmts = [];
             var spanApmts = [];
-            $.each(this._appointments(), function (i, apmt) {
+            $.each(schedules, function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
                 var days = Math.floor((datetime - 0) / that.dayMs);
@@ -173,14 +193,13 @@
                 d.setHours(0);
                 d.setMinutes(0);
                 d.setSeconds(0);
-                console.log(s,e,d);
                 var ml = 0, mr = 0;
-                if(s > d) {
+                if (s > d) {
                     var mins = (s - d) / 60000;
                     ml = 100 * mins / 24 / 60;
                 }
                 d.setDate(d.getDate() + 1);
-                if(e < d) {
+                if (e < d) {
                     var mins = (d - e) / 60000;
                     mr = 100 * mins / 24 / 60;
                 }
@@ -320,8 +339,20 @@
             }
             return num;
         },
+        _dateString: function (date) {
+            return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+        },
         _appointments: function () {
             return this.options.appointments || [];
+        },
+        setDataSource: function (ds) {
+            this.dataSource = ds;
+        },
+        _getSchedulesByDate: function (date, callback) {
+            var ds = this.dataSource || this.options.dataSource;
+            if (ds.getSchedulesByDate) {
+                return ds.getSchedulesByDate(date, callback);
+            }
         }
     });
 
