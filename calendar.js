@@ -148,16 +148,21 @@
             }
             function foo(err, schedules) {
                 clearTimeout(t);
+                that.date = datetime;
                 that.viewType = 'daily';
                 that.content.html('');
                 that._dailyView(datetime).appendTo(that.content);
+                that._bindDailyEvent();
                 that._showDailyAppointments(datetime, schedules);
             }
         },
         _dailyView: function (datetime) {
             datetime = datetime || new Date();
             var div = $('<div>').addClass('dcal');
-            var title = $('<div>').addClass('title').html(this._dateString(datetime)).appendTo(div);
+            var title = $('<div>').addClass('title').appendTo(div);
+            $('<span>').appendTo(title).addClass('btn prev').html('&lt;');
+            $('<span>').appendTo(title).addClass('txt').html(this._dateString(datetime));
+            $('<span>').appendTo(title).addClass('btn next').html('&gt;');
             var t = $('<div>').addClass('top').appendTo(div);
             $('<div>').addClass('span').appendTo(t);
             var l = $('<div>').addClass('leftcol').appendTo(div);
@@ -170,6 +175,23 @@
                 }
             }
             return div;
+        },
+        _bindDailyEvent: function () {
+            this._on(this.element.find('.btn.prev'), {
+                click: function (e) {
+                    var d = new Date(this.date);
+                    d.setDate(d.getDate() - 1);
+                    this.dailyView(d);
+                }
+            });
+
+            this._on(this.element.find('.btn.next'), {
+                click: function (e) {
+                    var d = new Date(this.date);
+                    d.setDate(d.getDate() + 1);
+                    this.dailyView(d);
+                }
+            });
         },
         _showDailyAppointments: function (datetime, schedules) {
             datetime = datetime || new Date();

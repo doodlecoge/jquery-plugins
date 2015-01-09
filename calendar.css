@@ -4,9 +4,10 @@
 .cal .btn {
     cursor: pointer;
     min-height: 15px;
+    padding: 0 5px;
 }
 .cal .btn:hover {
-    background: #eee;
+    background: #ccc;
 }
 .cal button {
     display: inline;
