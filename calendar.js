@@ -137,9 +137,11 @@
         },
         _dailyView: function (datetime) {
             var div = $('<div>').addClass('dcal');
+            var t = $('<div>').addClass('top').appendTo(div);
+            var span = $('<div>').addClass('span').appendTo(t);
+            //$('<div>').addClass('btn').appendTo(span);
             var l = $('<div>').addClass('leftcol').appendTo(div);
             var r = $('<div>').addClass('rightcol').appendTo(div);
-
             for (var i = 0; i < 24; i++) {
                 $('<div>').addClass('hour').html(this._pad0(i) + ':00').appendTo(l);
                 for (var j = 0; j < 4; j++) {
@@ -152,35 +154,59 @@
         _showDailyAppointments: function (datetime) {
             datetime = datetime || new Date();
             var that = this;
-
-            var arr = [];
+            var dailyApmts = [];
+            var spanApmts = [];
             $.each(this._appointments(), function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
                 var days = Math.floor((datetime - 0) / that.dayMs);
                 var day0 = Math.floor((s - 0) / that.dayMs);
                 var day1 = Math.floor((e - 0) / that.dayMs);
-                if (days !== day0 || days !== day1) return;
-                arr.push(apmt);
+                if (days < day0 || days > day1) return;
+                if (days != day0 || days != day1) spanApmts.push(apmt);
+                else dailyApmts.push(apmt);
             });
-
-            arr.sort(function (x, y) {
+            $.each(spanApmts, function (i, apmt) {
+                var s = new Date(apmt.start);
+                var e = new Date(apmt.end);
+                var d = new Date(datetime);
+                d.setHours(0);
+                d.setMinutes(0);
+                d.setSeconds(0);
+                console.log(s,e,d);
+                var ml = 0, mr = 0;
+                if(s > d) {
+                    var mins = (s - d) / 60000;
+                    ml = 100 * mins / 24 / 60;
+                }
+                d.setDate(d.getDate() + 1);
+                if(e < d) {
+                    var mins = (d - e) / 60000;
+                    mr = 100 * mins / 24 / 60;
+                }
+                $('<div>').html(apmt.subject)
+                    .addClass('span-apmt')
+                    .css('margin-left', ml + '%')
+                    .css('margin-right', mr + '%')
+                    .css('margin-top', '-1px')
+                    .appendTo(that.content.find('.span'));
+            });
+            dailyApmts.sort(function (x, y) {
                 return x.start > y.start;
             });
-
             var pos = [0];
-            $.each(arr, function (i, apmt) {
+            $.each(dailyApmts, function (i, apmt) {
                 if (i == 0) return;
                 var p = 0;
                 for (var j = 0; j < i; j++) {
-                    var t = arr[i - j - 1];
+                    var t = dailyApmts[i - j - 1];
                     if (t.end <= apmt.start) continue;
                     p = pos[i - j - 1] + 1;
                     break;
                 }
                 pos.push(p);
             });
-            $.each(arr, function (i, apmt) {
+            $.each(dailyApmts, function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
                 var total = 24 * 60;

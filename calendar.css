@@ -1,3 +1,10 @@
+.cal .btn {
+    cursor: pointer;
+    min-height: 15px;
+}
+.cal .btn:hover {
+    background: #eee;
+}
 .cal button {
     display: inline;
     border: 1px solid #eee;
@@ -10,6 +17,8 @@
     background: #ccc;
     cursor: pointer;
 }
+
+/*****************************************************************************/
 
 table.ycal {
     table-layout: fixed;
@@ -97,14 +106,7 @@ table.mcal td.not-this-month {
     padding: 0 20px;
 }
 
-.btn {
-    padding: 0px 5px;
-    cursor: pointer;
-}
 
-.btn:hover {
-    background: #ccc;
-}
 
 /*****************************************************************************/
 .dcal {
@@ -146,4 +148,16 @@ table.mcal td.not-this-month {
     border: 1px solid #000;
     /*box-sizing: border-box;*/
     opacity: 0.8;
+}
+.dcal .top {
+    border-bottom: 1px solid #69c;
+}
+.dcal .top .span {
+    margin-left: 99px;
+    border-left: 1px solid #69c;
+    padding: 5px 0;
+}
+.dcal .top .span .span-apmt {
+    background: #69c;
+    border: 1px solid #000;
 }
