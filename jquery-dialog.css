@@ -1,0 +1,64 @@
+
+
+.dlg {
+    position: fixed;
+    background: #fff;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+
+    box-shadow: 0px 0px 20px #888;
+    z-index: 10001;
+
+}
+
+.dlg_title {
+    line-height: 40px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ccc;
+
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(#fcfcfc, #eee);
+    background-image: linear-gradient(#fcfcfc, #eee);
+    background-repeat: repeat-x;
+
+
+    -webkit-border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -ms-border-radius: 5px 5px 0 0;
+    -o-border-radius: 5px 5px 0 0;
+    border-radius: 5px 5px 0 0;
+}
+
+.dlg_close_btn {
+    float: right;
+    color: #ff4500;
+    text-decoration: none;
+}
+
+.dlg_close_btn:hover {
+    color: #f00;
+}
+
+.dlg_close_btn:active {
+    color: #ff4500;
+}
+
+.dlg_content {
+    padding: 10px;
+}
+
+.dlg_btn_set {
+    line-height: 40px;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
+.dlg_btn_set button {
+    padding: 3px 20px;
+    font-family: font-family Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+    font-size: 16px;
+}
