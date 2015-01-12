@@ -4,8 +4,10 @@
 var _oldConsole = console;
 var _console = {
     log: function () {
-        var doc = $('html');
-        if (!doc.hasClass('console')) doc.addClass('console');
+        if (!$('html').hasClass('console')) {
+            $('html').addClass('console');
+            $('<ol>').addClass('console').appendTo(document.body);
+        }
         var log = $('<li>').appendTo('ol.console');
         $.each(arguments, function (i, arg) {
             $('<div>').html(JSON.stringify(arg)).appendTo(log);
