@@ -1,19 +1,23 @@
 body {
     font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
 }
+html.console body {
+    padding-bottom: 200px;
+}
 ol.console {
     height: 200px;
     overflow-y: auto;
     position: fixed;
     bottom: 0px;
-    background: #ccc;
-    width: 100%;
     z-index: 999999;
     margin: 0px;
     left: 0px;
+    right: 0;
+    border-top: 3px solid #f66;
+    border-bottom: 0px;
+    background: #eee;
 }
 ol.console li {
-    line-height: 30px;
     border-bottom: 1px dashed #ccc;
 }
 ol.console li span {

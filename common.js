@@ -1,14 +1,17 @@
 /**
  * Created by huaichao on 2015/1/9.
  */
+var _oldConsole = console;
 var _console = {
     log: function () {
-        var log = $('<li>').appendTo('.console');
+        var doc = $('html');
+        if (!doc.hasClass('console')) doc.addClass('console');
+        var log = $('<li>').appendTo('ol.console');
         $.each(arguments, function (i, arg) {
             $('<div>').html(JSON.stringify(arg)).appendTo(log);
         });
-        var c = $('.console').get(0);
-        c.scrollTop = c.scrollHeight;
+        var ol = $('.console');
+        ol.scrollTop(ol.get(0).scrollHeight);
     }
 };
 
