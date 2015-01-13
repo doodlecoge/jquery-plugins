@@ -1,8 +1,9 @@
 /**
  * Created by huaichao on 2015/1/12.
  */
-;(function ($) {
-    $.fn.plugin =function(name, prototype) {
+;
+(function ($) {
+    $.fn.plugin = function (name, prototype) {
         var constructor = function (options, element) {
             this.options = options || {};
             this.element = $(element);
@@ -44,6 +45,11 @@
                 var ins = $.data(this, name);
                 if (isMethodCall) {
                     if (!ins) $.error('not initialized yet');
+
+                    if (options === 'instance') {
+                        ret = ins;
+                        return false;
+                    }
 
                     var called = false;
 
