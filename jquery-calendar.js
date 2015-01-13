@@ -13,7 +13,19 @@
         },
         _create: function () {
             this._createWrapper();
-            this.dailyView();
+            this.viewType = 'daily';
+        },
+        _init: function () {
+            this.viewType = this.viewType || 'daily';
+            this.show();
+        },
+        show: function () {
+            switch (this.viewType) {
+                case 'daily':
+                    this.dailyView();
+                    break;
+
+            }
         },
         _createWrapper: function () {
             this.wrapper = $('<div>').addClass('cal').appendTo(this.element);
@@ -26,23 +38,25 @@
             this._on(year, {
                 click: function (e) {
                     this.content.html('');
-                    this._yearlyView().appendTo(this.content);
                     this.viewType = 'yearly';
+                    this.show();
                 }
             });
             var month = $('<button>').appendTo(this.legend).html('月');
             this._on(month, {
                 click: function (e) {
                     this.content.html('');
-                    this._monthlyView().appendTo(this.content);
                     this.viewType = 'monthly';
+                    this.show();
                 }
             });
             var week = $('<button>').appendTo(this.legend).html('周');
             var day = $('<button>').appendTo(this.legend).html('日');
             this._on(day, {
                 click: function (e) {
-                    this.dailyView();
+                    this.content.html('');
+                    this.viewType = 'daily';
+                    this.show();
                 }
             });
         },
@@ -77,7 +91,7 @@
                 that._dailyView(datetime).appendTo(that.content);
                 that._scrollDailyView();
                 that._bindDailyEvent();
-                that._showDailyAppointments(datetime, schedules);
+                that._showDailySchedules(datetime, schedules);
             }
         },
         _dailyView: function (datetime) {
@@ -129,11 +143,20 @@
                 click: function (e) {
                     var el = $(e.target);
                     if (el.hasClass('quarter')) {
-                        this.event && this.event.onAddSchedule &&
-                        this.event.onAddSchedule(el.index());
+                        if (this.event && this.event.onAddSchedule) {
+                            var mins = el.index() * 15;
+                            var hour = Math.floor(mins / 60), min = mins % 60;
+
+                            var d = new Date(this.date);
+                            d.setHours(hour);
+                            d.setMinutes(min);
+                            d = new Date(d - d % 60000);
+
+                            this.event.onAddSchedule(d);
+                        }
                     } else if (el.hasClass('schedule') || el.hasClass('span-schedule')) {
                         this.event && this.event.onViewSchedule &&
-                        this.event.onViewSchedule(el.index());
+                        this.event.onViewSchedule(el.data('schedule'));
                     }
                 }
             });
@@ -149,7 +172,7 @@
                 }
             });
         },
-        _showDailyAppointments: function (datetime, schedules) {
+        _showDailySchedules: function (datetime, schedules) {
             datetime = datetime || new Date();
             var that = this;
             var dailyApmts = [];
@@ -182,6 +205,7 @@
                     mr = 100 * mins / 24 / 60;
                 }
                 $('<div>').html(apmt.subject)
+                    .data('schedule', apmt)
                     .addClass('span-schedule')
                     .css('margin-left', ml + '%')
                     .css('margin-right', mr + '%')
@@ -189,20 +213,25 @@
                     .appendTo(that.content.find('.span'));
             });
             dailyApmts.sort(function (x, y) {
-                return x.start > y.start;
+                var dx  =new Date(x.start);
+                var dy = new Date(y.start);
+                return dx - dy > 0;
             });
+            console.log(dailyApmts);
             var pos = [0];
             $.each(dailyApmts, function (i, apmt) {
                 if (i == 0) return;
                 var p = 0;
                 for (var j = 0; j < i; j++) {
-                    var t = dailyApmts[i - j - 1];
-                    if (t.end <= apmt.start) continue;
+                    var dx  =new Date(dailyApmts[i - j - 1].end);
+                    var dy = new Date(apmt.start);
+                    if (dx <= dy) continue;
                     p = pos[i - j - 1] + 1;
                     break;
                 }
                 pos.push(p);
             });
+            console.log(pos);
             $.each(dailyApmts, function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
@@ -215,6 +244,7 @@
                 var height = 100 * (emins - smins) / total;
                 var width = 90 / cols;
                 $('<div>').addClass('schedule')
+                    .data('schedule', apmt)
                     .css('top', top + '%')
                     .css('left', left + '%')
                     .css('height', height + '%')

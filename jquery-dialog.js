@@ -2,7 +2,8 @@
  * Created by Administrator on 2015/1/12.
  */
 
-;(function($){
+;
+(function ($) {
     /*=======================================================================*/
     /* dialog                                                                */
     /*=======================================================================*/
@@ -13,23 +14,18 @@
             this._createButtons();
             this._initEventHandler();
         },
-        _init: function() {
-            this.show();
+        _init: function () {
+            //this.show();
         },
         _createButtons: function () {
             if (!this.options.buttons) return;
-
             var buttonSet = $('<div>')
                 .addClass('dlg_btn_set')
                 .appendTo(this.wrapper);
-
             var that = this;
-
             $.each(this.options.buttons, function (name, fn) {
                 var button = $('<button>')
-                    .html(name)
-                    .appendTo(buttonSet);
-
+                    .html(name).appendTo(buttonSet);
                 that._on(button, {
                     click: function (e) {
                         fn(e, this);
@@ -41,29 +37,17 @@
         _create_wrapper: function () {
             this.wrapper = $('<div class="dlg">').hide()
                 .appendTo(document.body);
-
-            var title = $('<div class="dlg_title">')
-                .appendTo(this.wrapper)
-                .html(this.options.title || '');
-
-
-            var close_btn = $('<a>')
+            this.title = $('<div class="dlg_title">')
+                .appendTo(this.wrapper);
+            var close_btn = $('<a>').html('close')
                 .addClass('dlg_close_btn')
                 .attr('href', 'javascript:;')
-                .appendTo(title);
-
-
-            $('<i>')
-                .addClass('fa')
-                .addClass('fa-times')
-                .appendTo(close_btn);
-
-
-            var content = $('<div>')
-                .addClass('dlg_content')
+                .appendTo(this.title);
+            $('<span>').addClass('txt').html(this.options.title || "")
+                .appendTo(this.title);
+            this.content = $('<div>').addClass('dlg_content')
                 .appendTo(this.wrapper);
-
-            this.element.appendTo(content);
+            this.element.appendTo(this.content);
         },
         _create_overlay: function () {
             var overlay = $('.global_overlay');
@@ -84,9 +68,12 @@
                 }
             });
         },
-        show: function () {
+        show: function (options) {
             this.overlay.show();
             this.wrapper.show();
+
+            if (options && options.title) this.title.find('.txt').html(options.title);
+
             var w = this.wrapper.width();
             var h = this.wrapper.height();
             this.wrapper.css('left', '50%');

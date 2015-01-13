@@ -16,7 +16,7 @@
 }
 
 .dlg_title {
-    line-height: 40px;
+    line-height: 50px;
     padding: 0 10px;
     border-bottom: 1px solid #ccc;
 
@@ -33,10 +33,16 @@
     border-radius: 5px 5px 0 0;
 }
 
+.dlg_title .txt {
+    font-weight: bold;
+    font-size: 20px;
+}
+
 .dlg_close_btn {
     float: right;
-    color: #ff4500;
+    color: #f88;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .dlg_close_btn:hover {
@@ -44,7 +50,7 @@
 }
 
 .dlg_close_btn:active {
-    color: #ff4500;
+    color: #f88;
 }
 
 .dlg_content {
