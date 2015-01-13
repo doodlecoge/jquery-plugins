@@ -37,7 +37,7 @@
 
             var isMethodCall = typeof options === 'string';
             var args = Array.prototype.slice.call(arguments, 1);
-            var ret = undefined;
+            var ret = this;
             this.each(function (i) {
 
                 var r = undefined;
@@ -70,10 +70,9 @@
                     }
                 } else {
                     if (ins) {
-                        if (ins._init) r = ins._init();
+                        if (ins._init) ins._init();
                     } else {
                         ins = new constructor(options, this);
-                        r = ins;
                         $.data(this, name, ins);
                     }
                 }
