@@ -23,8 +23,9 @@
 button {
     display: inline;
     border: 0px;
-    margin: 0 5px 5px 0;
-    padding: 0px;
+    margin: 0 5px;
+    padding: 3px 20px;
+    font-size: 12px;
 
     background-color: #eee;
     background-image: -webkit-linear-gradient(#fcfcfc, #eee);

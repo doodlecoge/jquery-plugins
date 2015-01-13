@@ -1,7 +1,6 @@
 /**
  * Created by huaichao on 2015/1/9.
  */
-var _oldConsole = console;
 var _console = {
     log: function () {
         if (!$('html').hasClass('console')) {
@@ -16,6 +15,10 @@ var _console = {
         ol.scrollTop(ol.get(0).scrollHeight);
     }
 };
+
+if (typeof console === 'undefined') {
+    console = _console;
+}
 
 
 !function (window) {
