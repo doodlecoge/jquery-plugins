@@ -11,7 +11,7 @@ var _console = {
         $.each(arguments, function (i, arg) {
             $('<div>').html(JSON.stringify(arg)).appendTo(log);
         });
-        var ol = $('.console');
+        var ol = $('ol.console');
         ol.scrollTop(ol.get(0).scrollHeight);
     }
 };

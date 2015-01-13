@@ -46,6 +46,14 @@
                 }
             });
         },
+        onAddSchedule: function (fn) {
+            this.event = this.event || {};
+            this.event.onAddSchedule = fn;
+        },
+        onViewSchedule: function (fn) {
+            this.event = this.event || {};
+            this.event.onViewSchedule = fn;
+        },
         dailyView: function (datetime) {
             var that = this;
             var t = setTimeout(function () {
@@ -67,6 +75,7 @@
                 that.viewType = 'daily';
                 that.content.html('');
                 that._dailyView(datetime).appendTo(that.content);
+                that._scrollDailyView();
                 that._bindDailyEvent();
                 that._showDailyAppointments(datetime, schedules);
             }
@@ -80,8 +89,10 @@
             $('<span>').appendTo(title).addClass('btn next').html('&gt;');
             var t = $('<div>').addClass('top').appendTo(div);
             $('<div>').addClass('span').appendTo(t);
-            var l = $('<div>').addClass('leftcol').appendTo(div);
-            var r = $('<div>').addClass('rightcol').appendTo(div);
+            var scroll = $('<div>').addClass('time-scroll').appendTo(div);
+            var l = $('<div>').addClass('leftcol').appendTo(scroll);
+            $('<div>').addClass('time-line').appendTo(l);
+            var r = $('<div>').addClass('rightcol').appendTo(scroll);
             for (var i = 0; i < 24; i++) {
                 $('<div>').addClass('hour').html(this._pad0(i) + ':00').appendTo(l);
                 for (var j = 0; j < 4; j++) {
@@ -91,6 +102,14 @@
             }
             return div;
         },
+        _scrollDailyView: function () {
+            var now = new Date();
+            var hours = now.getHours();
+            var mins = hours * 60 + now.getMinutes();
+            var el = this.element.find('.dcal .time-scroll');
+            el.scrollTop(el.get(0).scrollHeight * hours / 24 - 10);
+            this.element.find('.dcal .time-line').css('top', (mins * 100 / 24 / 60) + '%');
+        },
         _bindDailyEvent: function () {
             this._on(this.element.find('.btn.prev'), {
                 click: function (e) {
@@ -99,7 +118,6 @@
                     this.dailyView(d);
                 }
             });
-
             this._on(this.element.find('.btn.next'), {
                 click: function (e) {
                     var d = new Date(this.date);
@@ -107,17 +125,29 @@
                     this.dailyView(d);
                 }
             });
-
-            this._on(this.element.find('.cal'), {
+            this._on(this.element.find('.dcal'), {
                 click: function (e) {
                     var el = $(e.target);
                     if (el.hasClass('quarter')) {
-                        console.log(el.index());
-                    } else if (el.hasClass('apmt') || el.hasClass('span-apmt')) {
-                        console.log(el.html());
+                        this.event && this.event.onAddSchedule &&
+                        this.event.onAddSchedule(el.index());
+                    } else if (el.hasClass('schedule') || el.hasClass('span-schedule')) {
+                        this.event && this.event.onViewSchedule &&
+                        this.event.onViewSchedule(el.index());
                     }
                 }
-            })
+            });
+            this._on(this.element.find('.dcal .time-scroll'), {
+                scroll: function (e) {
+                    var scroll = $(e.target);
+                    var st = scroll.get(0).scrollTop;
+                    if (st > 0) {
+                        this.element.find('.dcal .top').addClass('bshadow');
+                    } else {
+                        this.element.find('.dcal .top').removeClass('bshadow');
+                    }
+                }
+            });
         },
         _showDailyAppointments: function (datetime, schedules) {
             datetime = datetime || new Date();
@@ -152,7 +182,7 @@
                     mr = 100 * mins / 24 / 60;
                 }
                 $('<div>').html(apmt.subject)
-                    .addClass('span-apmt')
+                    .addClass('span-schedule')
                     .css('margin-left', ml + '%')
                     .css('margin-right', mr + '%')
                     .css('margin-top', '-1px')
@@ -184,7 +214,7 @@
                 var left = 90 / cols * pos[i];
                 var height = 100 * (emins - smins) / total;
                 var width = 90 / cols;
-                $('<div>').addClass('apmt')
+                $('<div>').addClass('schedule')
                     .css('top', top + '%')
                     .css('left', left + '%')
                     .css('height', height + '%')
@@ -303,7 +333,6 @@
             }
         }
     });
-
 
 
 })(jQuery);

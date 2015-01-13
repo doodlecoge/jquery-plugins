@@ -12,6 +12,8 @@
             this._create_wrapper();
             this._createButtons();
             this._initEventHandler();
+        },
+        _init: function() {
             this.show();
         },
         _createButtons: function () {

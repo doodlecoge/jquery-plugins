@@ -21,11 +21,11 @@
 </p>
 <script type="text/javascript">
 
-//var console = _console;
+    //var console = _console;
 
     $(function () {
         $('#dialog').dialog({
-            title: 'Hello World',
+            title: 'Add Time',
             buttons: {
                 'OK': function (e, dlg) {
                     console.log(e.target);
@@ -35,7 +35,6 @@
                 }
             }
         });
-        $('#dialog').dialog('show');
 
         $('#yearlyView').calendar({
             dataSource: {
@@ -43,13 +42,13 @@
                     var schedules = [
                         {
                             start: '2015/01/08 05:00',
-                            end: '2015/01/09 10:30',
+                            end: '2015/01/13 10:30',
                             subject: 'Security framework 1'
                         },
                         {
                             id: 1,
                             start: '2015/01/08 09:20',
-                            end: '2015/01/09 12:30',
+                            end: '2015/01/13 12:30',
                             subject: 'Security framework 2'
                         },
                         {
@@ -60,38 +59,38 @@
                         },
                         {
                             id: 1,
-                            start: '2015/01/09 13:00',
+                            start: '2015/01/13 13:00',
                             end: '2015/01/12 18:30',
                             subject: 'Security framework 3'
                         },
                         {
-                            start: '2015/01/09 09:30',
-                            end: '2015/01/09 09:50',
+                            start: '2015/01/13 09:30',
+                            end: '2015/01/13 09:50',
                             subject: 'Department management page'
                         },
                         {
-                            start: '2015/01/09 10:10',
-                            end: '2015/01/09 11:30',
+                            start: '2015/01/13 10:10',
+                            end: '2015/01/13 11:30',
                             subject: 'DB Design and Dao'
                         },
                         {
-                            start: '2015/01/09 11:10',
-                            end: '2015/01/09 12:30',
+                            start: '2015/01/13 11:10',
+                            end: '2015/01/13 12:30',
                             subject: 'DB Design and Dao2'
                         },
                         {
-                            start: '2015/01/09 15:50',
-                            end: '2015/01/09 16:50',
+                            start: '2015/01/13 15:50',
+                            end: '2015/01/13 16:50',
                             subject: 'DB Design and Dao3'
                         },
                         {
-                            start: '2015/01/09 15:55',
-                            end: '2015/01/09 16:50',
+                            start: '2015/01/13 15:55',
+                            end: '2015/01/13 16:50',
                             subject: 'DB Design and Dao4'
                         },
                         {
-                            start: '2015/01/09 16:50',
-                            end: '2015/01/09 17:50',
+                            start: '2015/01/13 16:50',
+                            end: '2015/01/13 17:50',
                             subject: 'DB Design and Dao5'
                         },
 
@@ -122,9 +121,22 @@
         });
 
 
+        $('#yearlyView').calendar('onAddSchedule', function (time) {
+            $('#dialog').dialog('show', {
+                title: time
+            });
+        });
+
+        $('#yearlyView').calendar('onViewSchedule', function (time) {
+            $('#dialog').dialog('show', {
+                title: time
+            });
+        });
 
 
     });
+
+
 </script>
 
 
