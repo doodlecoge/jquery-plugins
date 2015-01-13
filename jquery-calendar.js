@@ -120,9 +120,13 @@
             var now = new Date();
             var hours = now.getHours();
             var mins = hours * 60 + now.getMinutes();
+            this.element.find('.dcal .time-line')
+                .css('top', (mins * 100 / 24 / 60) + '%');
             var el = this.element.find('.dcal .time-scroll');
-            el.scrollTop(el.get(0).scrollHeight * hours / 24 - 10);
-            this.element.find('.dcal .time-line').css('top', (mins * 100 / 24 / 60) + '%');
+            if (!this._scrollTop) {
+                this._scrollTop = el.get(0).scrollHeight * hours / 24 - 10;
+            }
+            el.scrollTop(this._scrollTop);
         },
         _bindDailyEvent: function () {
             this._on(this.element.find('.btn.prev'), {
@@ -164,6 +168,7 @@
                 scroll: function (e) {
                     var scroll = $(e.target);
                     var st = scroll.get(0).scrollTop;
+                    this._scrollTop = st;
                     if (st > 0) {
                         this.element.find('.dcal .top').addClass('bshadow');
                     } else {
@@ -213,7 +218,7 @@
                     .appendTo(that.content.find('.span'));
             });
             dailyApmts.sort(function (x, y) {
-                var dx  =new Date(x.start);
+                var dx = new Date(x.start);
                 var dy = new Date(y.start);
                 return dx - dy > 0;
             });
@@ -223,7 +228,7 @@
                 if (i == 0) return;
                 var p = 0;
                 for (var j = 0; j < i; j++) {
-                    var dx  =new Date(dailyApmts[i - j - 1].end);
+                    var dx = new Date(dailyApmts[i - j - 1].end);
                     var dy = new Date(apmt.start);
                     if (dx <= dy) continue;
                     p = pos[i - j - 1] + 1;

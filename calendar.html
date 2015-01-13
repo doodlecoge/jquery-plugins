@@ -194,10 +194,10 @@
         $('#yearlyView').calendar({
             dataSource: {
                 getSchedulesByDate: function (date, callback) {
-//                    setTimeout(function () {
-//                        callback(null, schedules);
-//                    }, 1000);
-                    return schedules;
+                    setTimeout(function () {
+                        callback(null, schedules);
+                    }, 500);
+//                    return schedules;
                 }
             }
         });
