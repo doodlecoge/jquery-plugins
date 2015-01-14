@@ -24,7 +24,6 @@
                 case 'daily':
                     this.dailyView();
                     break;
-
             }
         },
         _createWrapper: function () {
@@ -73,7 +72,7 @@
             var t = setTimeout(function () {
                 that.content.html('努力加载“' + that._dateString(datetime) + '”的数据中...');
             }, 100);
-            datetime = datetime || new Date();
+            datetime = datetime || this.date || new Date();
             var called = false;
             var schedules = this._getSchedulesByDate(datetime, function (err, schedules) {
                 if (called) return;
@@ -89,13 +88,12 @@
                 that.viewType = 'daily';
                 that.content.html('');
                 that._dailyView(datetime).appendTo(that.content);
-                that._scrollDailyView();
                 that._bindDailyEvent();
                 that._showDailySchedules(datetime, schedules);
+                that._scrollDailyView();
             }
         },
         _dailyView: function (datetime) {
-            datetime = datetime || new Date();
             var div = $('<div>').addClass('dcal');
             var title = $('<div>').addClass('title').appendTo(div);
             $('<span>').appendTo(title).addClass('btn prev').html('&lt;');
@@ -109,9 +107,9 @@
             var r = $('<div>').addClass('rightcol').appendTo(scroll);
             for (var i = 0; i < 24; i++) {
                 $('<div>').addClass('hour').html(this._pad0(i) + ':00').appendTo(l);
-                for (var j = 0; j < 4; j++) {
+                for (var j = 0; j < 2; j++) {
                     var d = $('<div>').addClass('quarter').appendTo(r);
-                    if (j == 3) d.addClass('last');
+                    if (j == 1) d.addClass('last');
                 }
             }
             return div;
@@ -123,7 +121,7 @@
             this.element.find('.dcal .time-line')
                 .css('top', (mins * 100 / 24 / 60) + '%');
             var el = this.element.find('.dcal .time-scroll');
-            if (!this._scrollTop) {
+            if (typeof this._scrollTop !== "number") {
                 this._scrollTop = el.get(0).scrollHeight * hours / 24 - 10;
             }
             el.scrollTop(this._scrollTop);
@@ -148,7 +146,7 @@
                     var el = $(e.target);
                     if (el.hasClass('quarter')) {
                         if (this.event && this.event.onAddSchedule) {
-                            var mins = el.index() * 15;
+                            var mins = el.index() * 30;
                             var hour = Math.floor(mins / 60), min = mins % 60;
 
                             var d = new Date(this.date);
@@ -178,16 +176,15 @@
             });
         },
         _showDailySchedules: function (datetime, schedules) {
-            datetime = datetime || new Date();
             var that = this;
             var dailyApmts = [];
             var spanApmts = [];
             $.each(schedules, function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);
-                var days = Math.floor((datetime - 0) / that.dayMs);
-                var day0 = Math.floor((s - 0) / that.dayMs);
-                var day1 = Math.floor((e - 0) / that.dayMs);
+                var days = datetime.getFullYear() + datetime.getMonth() + datetime.getDate();
+                var day0 = s.getFullYear() + s.getMonth() + s.getDate();
+                var day1 = e.getFullYear() + e.getMonth() + e.getDate();
                 if (days < day0 || days > day1) return;
                 if (days != day0 || days != day1) spanApmts.push(apmt);
                 else dailyApmts.push(apmt);
@@ -353,7 +350,7 @@
             return num;
         },
         _dateString: function (date) {
-            return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+            return date.getFullYear() + '/' + this._pad0(date.getMonth() + 1) + '/' + this._pad0(date.getDate());
         },
         _appointments: function () {
             return this.options.appointments || [];

@@ -135,7 +135,7 @@ table.mcal td.not-this-month {
 }
 
 .dcal .leftcol .hour {
-    height: 63px;
+    height: 31px;
     text-align: center;
     border-bottom: 1px solid #69c;
     border-right: 1px solid #69c;
@@ -164,7 +164,7 @@ table.mcal td.not-this-month {
     position: absolute;
     background: #69c;
     border: 1px solid #000;
-    /*box-sizing: border-box;*/
+    box-sizing: border-box;
     opacity: 0.8;
 }
 
