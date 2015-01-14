@@ -219,7 +219,6 @@
                 var dy = new Date(y.start);
                 return dx - dy > 0;
             });
-            console.log(dailyApmts);
             var pos = [0];
             $.each(dailyApmts, function (i, apmt) {
                 if (i == 0) return;
@@ -233,7 +232,6 @@
                 }
                 pos.push(p);
             });
-            console.log(pos);
             $.each(dailyApmts, function (i, apmt) {
                 var s = new Date(apmt.start);
                 var e = new Date(apmt.end);

@@ -162,18 +162,19 @@
                     var subject = dlg.element.find('input:eq(0)').val();
                     var s = dlg.element.find('input:eq(1)').val();
                     var e = dlg.element.find('input:eq(2)').val();
-
                     var id = dlg.element.find('input[type=hidden]').val();
+
                     if (id) {
                         $.each(schedules, function (i, schedule) {
                             if(schedule.id == id) {
+                            console.log(i);
                                 schedule.subject = subject;
                                 schedule.start = s;
                                 schedule.end = e;
                             }
                         });
                     } else {
-                        var id = schedules.length;
+                        id = schedules.length + 1;
                         schedules.push({
                             id: id,
                             subject: subject,
@@ -181,7 +182,6 @@
                             end: e
                         });
                     }
-
 
                     $('#yearlyView').calendar();
                 },
@@ -212,7 +212,7 @@
                     ' ' + date.getHours() + ':' + date.getMinutes();
             d.element.find('input:eq(1)').val(s);
             d.element.find('input:eq(2)').val(e);
-            d.element.find('input[type=hidden]').val('');
+            d.element.find('input[type=hidden]').val(schedules.id);
             $('#dialog').dialog('show', {
                 title: 'Schedule Meeting'
             });
