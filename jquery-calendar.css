@@ -189,6 +189,7 @@ table.mcal td.not-this-month {
 
 .dcal .top .span .span-schedule {
     border: 1px solid #444;
+    height: 20px;
     background: #eee;
     background-image: -webkit-linear-gradient(#eee, #ddd);
     background-image: linear-gradient(#eee, #ddd);
@@ -276,10 +277,12 @@ table.mcal td.not-this-month {
 .wcal .grid {
 
 }
+
 .wcal .grid .lcol {
     border-top: 1px solid #ccd;
     margin-top: -1px;
 }
+
 .wcal .grid .lcol .cell {
     height: 30px;
     border-right: 1px solid #ccd;

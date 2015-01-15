@@ -531,9 +531,12 @@
         },
         _getSchedulesByDate: function (date, callback) {
             var ds = this.dataSource || this.options.dataSource;
-            if (ds.getSchedulesByDate) {
+            if (ds && ds.getSchedulesByDate) {
                 return ds.getSchedulesByDate(date, callback);
             }
+            return function () {
+                return [];
+            };
         },
         beginOfDay: function (date, clone) {
             if (!!clone) date = new Date(date);
