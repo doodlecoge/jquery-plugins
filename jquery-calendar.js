@@ -176,18 +176,18 @@
                     }
                 }
             });
-            this._on(this.element.find('.dcal .time-scroll'), {
-                scroll: function (e) {
-                    var scroll = $(e.target);
-                    var st = scroll.get(0).scrollTop;
-                    this._scrollTop = st;
-                    if (st > 0) {
-                        this.element.find('.dcal .top').addClass('bshadow');
-                    } else {
-                        this.element.find('.dcal .top').removeClass('bshadow');
-                    }
-                }
-            });
+            //this._on(this.element.find('.dcal .time-scroll'), {
+            //    scroll: function (e) {
+            //        var scroll = $(e.target);
+            //        var st = scroll.get(0).scrollTop;
+            //        this._scrollTop = st;
+            //        if (st > 0) {
+            //            this.element.find('.dcal .top').addClass('bshadow');
+            //        } else {
+            //            this.element.find('.dcal .top').removeClass('bshadow');
+            //        }
+            //    }
+            //});
         },
         _showDailySchedules: function (datetime, schedules) {
             var that = this;

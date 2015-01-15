@@ -110,14 +110,6 @@ table.mcal td.not-this-month {
 }
 
 .dcal .time-scroll {
-    height: 400px;
-    overflow-y: auto;
-
-    transition: width 2s;
-    -moz-transition: scrollTop 2s; /* Firefox 4 */
-    -webkit-transition: width 2s; /* Safari 和 Chrome */
-    -o-transition: width 2s; /* Opera */
-
 }
 
 .dcal .leftcol {
@@ -175,10 +167,6 @@ table.mcal td.not-this-month {
 .dcal .top {
     border-bottom: 1px solid #ccd;
     position: relative;
-}
-
-.bshadow {
-    box-shadow: 0px 5px 10px #888;
 }
 
 .dcal .top .span {
