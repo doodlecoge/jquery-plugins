@@ -201,3 +201,129 @@ table.mcal td.not-this-month {
     text-align: center;
     font-size: 24px;
 }
+
+/*****************************************************************************/
+
+.wcal {
+    border-top: 1px solid #ccd;
+    border-left: 1px solid #ccd;
+}
+
+.wcal .wdays {
+    height: 30px;
+    line-height: 29px;
+    margin-left: 100px;
+    border-left: 1px solid #ccd;
+}
+
+.wcal .wdays:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.wcal .wdays .wday {
+    float: left;
+    width: 14.285714%;
+    text-align: center;
+    border-right: 1px solid #ccd;
+    border-bottom: 1px solid #ccd;
+    box-sizing: border-box;
+}
+
+.wcal .spans {
+    margin-left: 100px;
+    border-left: 1px solid #ccd;
+    border-bottom: 1px solid #ccd;
+}
+
+.wcal .spans:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.wcal .spans .day {
+    width: 14.285714%;
+    text-align: center;
+    border-right: 1px solid #ccd;
+    box-sizing: border-box;
+    padding: 5px 0;
+    float: left;
+}
+
+.wcal .spans .schedule {
+    height: 20px;
+    border: 1px solid #444;
+    background: #eee;
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(#eee, #ddd);
+    background-repeat: repeat-x;
+    margin-top: 2px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: keep-all;
+    position: relative;
+}
+
+.wcal .spans .pholder {
+    height: 1px;
+    margin-top: 23px;
+}
+
+.wcal .grid {
+
+}
+.wcal .grid .lcol {
+    border-top: 1px solid #ccd;
+    margin-top: -1px;
+}
+.wcal .grid .lcol .cell {
+    height: 30px;
+    border-right: 1px solid #ccd;
+    border-bottom: 1px solid #ccd;
+    text-align: center;
+}
+
+.wcal .grid .lcol {
+    width: 101px;
+    float: left;
+}
+
+.wcal .grid .rcol {
+    margin-left: 101px;
+}
+
+.wcal .grid .rcol:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.wcal .grid .rcol .wcol {
+    width: 14.285714%;
+    float: left;
+    position: relative;
+}
+
+.wcal .grid .rcol .wcol .schedule {
+    position: absolute;
+    height: 20px;
+    border: 1px solid #444;
+    background: #eee;
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(#eee, #ddd);
+    background-repeat: repeat-x;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: keep-all;
+}
+
+.wcal .grid .rcol .wcol .cell {
+    border-right: 1px solid #ccd;
+    border-bottom: 1px solid #ccd;
+    height: 30px;
+}

@@ -13,16 +13,19 @@
         },
         _create: function () {
             this._createWrapper();
-            this.viewType = 'daily';
         },
         _init: function () {
-            this.viewType = this.viewType || 'daily';
+            //this.viewType = this.viewType || 'daily';
+            this.viewType = this.viewType || 'weekly';
             this.show();
         },
         show: function () {
             switch (this.viewType) {
                 case 'daily':
                     this.dailyView();
+                    break;
+                case 'weekly':
+                    this.weeklyView();
                     break;
             }
         },
@@ -50,6 +53,13 @@
                 }
             });
             var week = $('<button>').appendTo(this.legend).html('周');
+            this._on(week, {
+                click: function (e) {
+                    this.content.html('');
+                    this.viewType = 'weekly';
+                    this.show();
+                }
+            });
             var day = $('<button>').appendTo(this.legend).html('日');
             this._on(day, {
                 click: function (e) {
@@ -84,6 +94,10 @@
             }
             function foo(err, schedules) {
                 clearTimeout(t);
+                $.each(schedules, function (i, schedule) {
+                    schedule.start = new Date(schedule.start);
+                    schedule.end = new Date(schedule.end);
+                });
                 that.date = datetime;
                 that.viewType = 'daily';
                 that.content.html('');
@@ -260,6 +274,165 @@
                 return pos[i] + 1;
             }
         },
+        weeklyView: function (datetime) {
+            var that = this;
+            var t = setTimeout(function () {
+                that.content.html('努力加载“' + that._dateString(datetime) + '”的数据中...');
+            }, 100);
+            datetime = datetime || this.date || new Date();
+            var called = false;
+            var schedules = this._getSchedulesByDate(datetime, function (err, schedules) {
+                if (called) return;
+                called = true;
+                foo(err, schedules);
+            });
+            if (!called && schedules) {
+                foo(null, schedules);
+            }
+            function foo(err, schedules) {
+                clearTimeout(t);
+                $.each(schedules, function (i, schedule) {
+                    schedule.start = new Date(schedule.start);
+                    schedule.end = new Date(schedule.end);
+                });
+                that.date = datetime;
+                that.viewType = 'daily';
+                that.content.html('');
+                that._weeklyView(datetime).appendTo(that.content);
+                that._showWeeklySchedule(datetime, schedules);
+            }
+        },
+        _weeklyView: function (datetime) {
+            var div = $('<div>').addClass('wcal');
+            var wdays = $('<div>').addClass('wdays').appendTo(div);
+            var spans = $('<div>').addClass('spans').appendTo(div);
+
+            var d = new Date(datetime - this.dayMs * datetime.getDay());
+            for (var i = 0; i < 7; i++) {
+                var txt = this.l10n.weekNames[i] + '(' + this._dateString(d) + ')';
+                $('<div>').addClass('wday').appendTo(wdays).html(txt);
+                $('<div>').addClass('day').appendTo(spans);
+                d.setDate(d.getDate() + 1);
+            }
+
+            var g = $('<div>').addClass('grid').appendTo(div);
+            var l = $('<div>').addClass('lcol').appendTo(g);
+            var r = $('<div>').addClass('rcol').appendTo(g);
+
+            for (var i = 0; i < 7; i++) {
+                var d = $('<div>').addClass('wcol').appendTo(r);
+                for (var j = 0; j < 24; j++) {
+                    $('<div>').addClass('cell').appendTo(d);
+                }
+            }
+
+            for (var i = 0; i < 24; i++) {
+                $('<div>').addClass('cell').html(this._pad0(i) + ":00").appendTo(l);
+            }
+
+            return div;
+        },
+        _showWeeklySchedule: function (datetime, schedules) {
+            var that = this;
+            var dailyApmts = [];
+            var spanApmts = [];
+            var sweek = this.beginOfWeek(datetime, true);
+            var eweek = this.endOfWeek(datetime, true);
+
+            $.each(schedules, function (i, apmt) {
+                var s = apmt.start;
+                var e = apmt.end;
+                if (e < sweek || s > eweek) return;
+                if (e.getDate() != s.getDate()) spanApmts.push(apmt);
+                else dailyApmts.push(apmt);
+            });
+
+            spanApmts.sort(function (x, y) {
+                return x.start - y.start;
+            });
+
+            $.each(spanApmts, function (i, apmt) {
+                var s = new Date(apmt.start);
+                var e = new Date(apmt.end);
+
+                var idx = 0, ml = 0, w;
+                if (s > sweek) {
+                    idx = s.getDay();
+                    var mins = s.getHours() * 60 + s.getMinutes();
+                    ml = mins * 100 / 24 / 60;
+                }
+
+                var mins = (Math.min(eweek, e) - Math.max(sweek, s)) / 60000;
+                w = mins * 100 / 24 / 60;
+
+                var days = that.content.find('.spans .day');
+                for (var i = 0; i < 7; i++) {
+                    var d = $('<div>').appendTo(days.get(i));
+                    if (idx == i)
+                        d.addClass('schedule').html(apmt.subject)
+                            .css('margin-left', ml + '%')
+                            .css('width', w + '%');
+                    else
+                        d.addClass('pholder');
+                }
+            });
+
+
+            // daily
+            dailyApmts.sort(function (x, y) {
+                return x.start - y.start;
+            });
+
+            var weekData = [];
+            for (var i = 0; i < 7; i++) weekData.push([]);
+            $.each(dailyApmts, function (i, apmt) {
+                weekData[apmt.start.getDay()].push(apmt);
+            });
+
+            for (var i = 0; i < 7; i++) {
+                var arr = weekData[i];
+                var pos = [0];
+                $.each(arr, function (i, apmt) {
+                    if (i == 0) return;
+                    var p = 0;
+                    for (var j = 0; j < i; j++) {
+                        var dx = arr[i - j - 1].end;
+                        var dy = apmt.start;
+                        if (dx <= dy) continue;
+                        p = pos[i - j - 1] + 1;
+                        break;
+                    }
+                    pos.push(p);
+                });
+                $.each(arr, function (k, apmt) {
+                    var s = apmt.start;
+                    var e = apmt.end;
+                    var total = 24 * 60;
+                    var cols = getWidth(pos, k);
+                    var smins = s.getHours() * 60 + s.getMinutes();
+                    var emins = e.getHours() * 60 + e.getMinutes();
+                    var top = 100 * smins / total;
+                    var left = 90 / cols * pos[k];
+                    var height = 100 * (emins - smins) / total;
+                    var width = 90 / cols;
+                    $('<div>').addClass('schedule')
+                        .data('schedule', apmt)
+                        .css('top', top + '%')
+                        .css('left', left + '%')
+                        .css('height', height + '%')
+                        .css('width', width + '%')
+                        .html(apmt.subject)
+                        .appendTo(that.content.find('.wcol:eq(' + i + ')'));
+                });
+            }
+
+            function getWidth(pos, i) {
+                for (; i < pos.length - 1; i++) {
+                    if (pos[i + 1] == 0)break;
+                }
+                return pos[i] + 1;
+            }
+        },
         monthlyView: function (datetime) {
 
         },
@@ -361,6 +534,40 @@
             if (ds.getSchedulesByDate) {
                 return ds.getSchedulesByDate(date, callback);
             }
+        },
+        beginOfDay: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            return date;
+        },
+        endOfDay: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setHours(23);
+            date.setMinutes(59);
+            date.setSeconds(59);
+            date.setMilliseconds(999);
+            return date;
+        },
+        beginOfWeek: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setDate(date.getDate() - date.getDay());
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            return date;
+        },
+        endOfWeek: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setDate(date.getDate() - 0 + (6 - date.getDay()));
+            date.setHours(23);
+            date.setMinutes(59);
+            date.setSeconds(59);
+            date.setMilliseconds(999);
+            return date;
         }
     });
 
