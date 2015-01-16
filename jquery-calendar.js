@@ -28,6 +28,22 @@
                     this.weeklyView();
                     break;
             }
+
+            this._updateButtonState();
+        },
+        _updateButtonState: function() {
+            this.legend.find('button').removeClass('blue');
+            switch (this.viewType) {
+                case 'daily':
+                    this.legend.find('button:eq(0)').addClass('blue');
+                    break;
+                case 'weekly':
+                    this.legend.find('button:eq(1)').addClass('blue');
+                    break;
+                case 'monthly':
+                    this.legend.find('button:eq(2)').addClass('blue');
+                    break;
+            }
         },
         _createWrapper: function () {
             this.wrapper = $('<div>').addClass('cal').appendTo(this.element);
@@ -36,23 +52,27 @@
             this.content = $('<div>').addClass('content').appendTo(this.wrapper);
         },
         _createLegendButtons: function () {
-            var year = $('<button>').appendTo(this.legend).html('年');
-            this._on(year, {
+            //var year = $('<button>').appendTo(this.legend).html('年');
+            //this._on(year, {
+            //    click: function (e) {
+            //        this.content.html('');
+            //        this.viewType = 'yearly';
+            //        this.show();
+            //    }
+            //});
+
+            var day = $('<button>').appendTo(this.legend).html('每日')
+                .addClass('button');
+            this._on(day, {
                 click: function (e) {
                     this.content.html('');
-                    this.viewType = 'yearly';
+                    this.viewType = 'daily';
                     this.show();
                 }
             });
-            var month = $('<button>').appendTo(this.legend).html('月');
-            this._on(month, {
-                click: function (e) {
-                    this.content.html('');
-                    this.viewType = 'monthly';
-                    this.show();
-                }
-            });
-            var week = $('<button>').appendTo(this.legend).html('周');
+
+            var week = $('<button>').appendTo(this.legend).html('每周')
+                .addClass('button');
             this._on(week, {
                 click: function (e) {
                     this.content.html('');
@@ -60,11 +80,13 @@
                     this.show();
                 }
             });
-            var day = $('<button>').appendTo(this.legend).html('日');
-            this._on(day, {
+
+            var month = $('<button>').appendTo(this.legend).html('每月')
+                .addClass('button');
+            this._on(month, {
                 click: function (e) {
                     this.content.html('');
-                    this.viewType = 'daily';
+                    this.viewType = 'monthly';
                     this.show();
                 }
             });
@@ -296,7 +318,7 @@
                     schedule.end = new Date(schedule.end);
                 });
                 that.date = datetime;
-                that.viewType = 'daily';
+                that.viewType = 'weekly';
                 that.content.html('');
                 that._weeklyView(datetime).appendTo(that.content);
                 that._showWeeklySchedule(datetime, schedules);
