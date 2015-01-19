@@ -141,6 +141,7 @@ table.mcal td.not-this-month {
 .dcal .rightcol .quarter {
     border-bottom: 1px dashed #ccc;
     height: 15px;
+    cursor: pointer;
 }
 
 .dcal .rightcol .quarter:hover {
@@ -162,6 +163,7 @@ table.mcal td.not-this-month {
     background-image: -webkit-linear-gradient(#eee, #ddd);
     background-image: linear-gradient(#eee, #ddd);
     background-repeat: repeat-x;
+    cursor: pointer;
 }
 
 .dcal .top {
@@ -182,6 +184,7 @@ table.mcal td.not-this-month {
     background-image: -webkit-linear-gradient(#eee, #ddd);
     background-image: linear-gradient(#eee, #ddd);
     background-repeat: repeat-x;
+    cursor: pointer;
 }
 
 .dcal .title {
