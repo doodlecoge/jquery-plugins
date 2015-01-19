@@ -102,7 +102,7 @@
         dailyView: function (datetime) {
             var that = this;
             var t = setTimeout(function () {
-                that.content.html('努力加载“' + that._dateString(datetime) + '”的数据中...');
+                that.content.html('努力加载数据中...');
             }, 100);
             datetime = datetime || this.date || new Date();
             var called = false;
@@ -299,7 +299,7 @@
         weeklyView: function (datetime) {
             var that = this;
             var t = setTimeout(function () {
-                that.content.html('努力加载“' + that._dateString(datetime) + '”的数据中...');
+                that.content.html('努力加载数据中...');
             }, 100);
             datetime = datetime || this.date || new Date();
             var called = false;

@@ -158,7 +158,7 @@
         $('#dialog').dialog({
             title: 'Add Time',
             buttons: {
-                'OK': function (e, dlg) {
+                '确定': function (e, dlg) {
                     var subject = dlg.element.find('input:eq(0)').val();
                     var s = dlg.element.find('input:eq(1)').val();
                     var e = dlg.element.find('input:eq(2)').val();
@@ -185,7 +185,7 @@
 
                     $('#yearlyView').calendar();
                 },
-                'Cancel': function (e, dlg) {
+                '取消': function (e, dlg) {
                     dlg._close();
                 }
             }
@@ -194,10 +194,10 @@
         $('#yearlyView').calendar({
             dataSource: {
                 getSchedulesByDate: function (date, callback) {
-//                    setTimeout(function () {
-//                        callback(null, schedules);
-//                    }, 500);
-                    return schedules;
+                    setTimeout(function () {
+                        callback(null, schedules);
+                    }, 500);
+//                    return schedules;
                 }
             }
         });

@@ -25,6 +25,7 @@
             var that = this;
             $.each(this.options.buttons, function (name, fn) {
                 var button = $('<button>')
+                    .addClass('button')
                     .html(name).appendTo(buttonSet);
                 that._on(button, {
                     click: function (e) {
