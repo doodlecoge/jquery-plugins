@@ -31,7 +31,7 @@
 
             this._updateButtonState();
         },
-        _updateButtonState: function() {
+        _updateButtonState: function () {
             this.legend.find('button').removeClass('blue');
             switch (this.viewType) {
                 case 'daily':
@@ -322,10 +322,18 @@
                 that.content.html('');
                 that._weeklyView(datetime).appendTo(that.content);
                 that._showWeeklySchedule(datetime, schedules);
+                that._bindWeeklyEvents();
             }
         },
         _weeklyView: function (datetime) {
             var div = $('<div>').addClass('wcal');
+            var title = $('<div>').addClass('title').appendTo(div);
+            $('<span>').addClass('btn prev').html('&lt;').appendTo(title);
+            var sw = this.beginOfWeek(datetime, true);
+            var ew = this.endOfWeek(datetime, true);
+
+            $('<span>').addClass('txt').html(this._dateString(sw) + ' ~ ' + this._dateString(ew)).appendTo(title);
+            $('<span>').addClass('btn next').html('&gt;').appendTo(title);
             var wdays = $('<div>').addClass('wdays').appendTo(div);
             var spans = $('<div>').addClass('spans').appendTo(div);
 
@@ -391,7 +399,9 @@
                 for (var i = 0; i < 7; i++) {
                     var d = $('<div>').appendTo(days.get(i));
                     if (idx == i)
-                        d.addClass('schedule').html(apmt.subject)
+                        d.addClass('schedule')
+                            .html(apmt.subject)
+                            .data('schedule', apmt)
                             .css('margin-left', ml + '%')
                             .css('width', w + '%');
                     else
@@ -454,6 +464,38 @@
                 }
                 return pos[i] + 1;
             }
+        },
+        _bindWeeklyEvents: function () {
+            this._on(this.content.find('.btn.prev'), {
+                click: function () {
+                    var d = new Date(this.date - this.dayMs * 7);
+                    this.weeklyView(d);
+                }
+            });
+
+            this._on(this.content.find('.btn.next'), {
+                click: function () {
+                    var d = new Date(this.date - 0 + this.dayMs * 7);
+                    this.weeklyView(d);
+                }
+            });
+
+            this._on(this.content.find('.wcal'), {
+                click: function (e) {
+                    var el = $(e.target);
+                    if (el.hasClass('cell')) {
+                        if (this.event && this.event.onAddSchedule) {
+                            var d = this.beginOfWeek(this.date);
+                            d.setDate(d.getDate() + el.parent().index());
+                            d.setHours(el.index());
+                            this.event.onAddSchedule(d);
+                        }
+                    } else if (el.hasClass('schedule')) {
+                        this.event && this.event.onViewSchedule &&
+                        this.event.onViewSchedule(el.data('schedule'));
+                    }
+                }
+            });
         },
         monthlyView: function (datetime) {
 

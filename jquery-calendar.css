@@ -198,6 +198,18 @@ table.mcal td.not-this-month {
     border-left: 1px solid #ccd;
 }
 
+.wcal .title {
+    line-height: 50px;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    text-align: center;
+    font-size: 24px;
+}
+
+.wcal .title .txt {
+
+}
+
 .wcal .wdays {
     height: 30px;
     line-height: 29px;
@@ -255,6 +267,7 @@ table.mcal td.not-this-month {
     white-space: nowrap;
     word-break: keep-all;
     position: relative;
+    cursor: pointer;
 }
 
 .wcal .spans .pholder {
@@ -311,10 +324,16 @@ table.mcal td.not-this-month {
     text-overflow: ellipsis;
     overflow: hidden;
     word-break: keep-all;
+    cursor: pointer;
 }
 
 .wcal .grid .rcol .wcol .cell {
     border-right: 1px solid #ccd;
     border-bottom: 1px solid #ccd;
     height: 30px;
+    cursor: pointer;
+}
+
+.wcal .grid .rcol .wcol .cell:hover {
+    background: #eee;
 }
