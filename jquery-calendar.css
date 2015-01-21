@@ -16,89 +16,6 @@
     padding: 5px 0;
 }
 
-/*****************************************************************************/
-
-table.ycal {
-    table-layout: fixed;
-    border-collapse: collapse;
-    background: #ccc;
-}
-
-table.ycal td {
-    padding: 0;
-    border: 2px solid #ccc;
-    vertical-align: middle;
-    text-align: center;
-    height: 30px;
-}
-
-table.ycal td.title {
-    background: #fff;
-    font-size: 16px;
-    background: #ccd;
-}
-
-table.ycal table td {
-    width: 30px;
-    height: 20px;
-    overflow: hidden;
-    border: 2px solid #fff;
-    background: #ccc;
-    padding: 0;
-    font-size: 12px;
-}
-
-table.ycal table td.title {
-    background: #fff;
-}
-
-table.ycal table td.none {
-    background: #fff;
-    color: #ccc;
-}
-
-table.ycal table td.cur {
-    border-bottom: 2px solid #f33;
-}
-
-table.ycal table td.sel {
-    border-bottom: 2px solid #ccd;
-}
-
-/*****************************************************************************/
-
-table.mcal {
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 100%;
-    font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
-}
-
-table.mcal th {
-    border: 2px solid #ccc;
-    padding: 10px 0;
-    background: #ccd;
-
-}
-
-table.mcal td {
-    border: 2px solid #ccc;
-    padding: 0;
-    height: 60px;
-    vertical-align: top;
-}
-
-table.mcal td.title {
-    vertical-align: middle;
-    text-align: center;
-    font-size: 24px;
-}
-
-table.mcal td.not-this-month {
-    color: #aaa;
-    background: #eee;
-}
-
 .cal .txt {
     padding: 0 20px;
 }
@@ -339,4 +256,42 @@ table.mcal td.not-this-month {
 
 .wcal .grid .rcol .wcol .cell:hover {
     background: #eee;
+}
+
+/*****************************************************************************/
+
+.mcal {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.mcal td {
+    border: 1px solid #ccd;
+    text-align: center;
+}
+
+.mcal td.title {
+    line-height: 50px;
+    font-size: 24px;
+
+}
+
+.mcal td.h {
+    background: #eee;
+    height: 30px;
+}
+
+.mcal td.l {
+    width: 50px;
+    vertical-align: top;
+    background: #eee;
+}
+
+.mcal td.gray {
+    color: #ccc;
+}
+
+.mcal td.cell {
+    height: 50px;
 }

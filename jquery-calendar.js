@@ -16,7 +16,7 @@
         },
         _init: function () {
             //this.viewType = this.viewType || 'daily';
-            this.viewType = this.viewType || 'weekly';
+            this.viewType = this.viewType || 'monthly';
             this.show();
         },
         show: function () {
@@ -26,6 +26,9 @@
                     break;
                 case 'weekly':
                     this.weeklyView();
+                    break;
+                case 'monthly':
+                    this.monthlyView();
                     break;
             }
 
@@ -52,15 +55,6 @@
             this.content = $('<div>').addClass('content').appendTo(this.wrapper);
         },
         _createLegendButtons: function () {
-            //var year = $('<button>').appendTo(this.legend).html('年');
-            //this._on(year, {
-            //    click: function (e) {
-            //        this.content.html('');
-            //        this.viewType = 'yearly';
-            //        this.show();
-            //    }
-            //});
-
             var day = $('<button>').appendTo(this.legend).html('每日')
                 .addClass('button');
             this._on(day, {
@@ -498,40 +492,95 @@
             });
         },
         monthlyView: function (datetime) {
-
+            var that = this;
+            var t = setTimeout(function () {
+                that.content.html('努力加载数据中...');
+            }, 100);
+            datetime = datetime || this.date || new Date();
+            var called = false;
+            var schedules = this._getSchedulesByDate(datetime, function (err, schedules) {
+                if (called) return;
+                called = true;
+                foo(err, schedules);
+            });
+            if (!called && schedules) {
+                foo(null, schedules);
+            }
+            function foo(err, schedules) {
+                clearTimeout(t);
+                $.each(schedules, function (i, schedule) {
+                    schedule.start = new Date(schedule.start);
+                    schedule.end = new Date(schedule.end);
+                });
+                that.date = datetime;
+                that.viewType = 'monthly';
+                that.content.html('');
+                that._monthlyView(datetime).appendTo(that.content);
+                //that._bindDailyEvent();
+                that._bindMonthlyEvent();
+                that._showMonthlySchedules(datetime, schedules);
+            }
         },
         _monthlyView: function (datetime) {
-            var now = datetime || new Date();
-            var date = new Date(now);
+            var sm = this.beginOfMonth(datetime, true);
+            var em = this.endOfMonth(datetime, true);
+            var rows = Math.ceil((em.getDate() + sm.getDay()) / 7),
+                tbl = $('<table>').addClass('mcal'), tr, td;
 
-            // first day this month
-            date.setDate(1);
-
-            // date of first cell
-            date = new Date(date - date.getDay() * this.dayMs);
-            var tbl = $('<table>').addClass('mcal'), tr, td;
+            // switch month button
             tr = $('<tr>').appendTo(tbl);
-            td = $('<td>').attr('colspan', 7).addClass('title').appendTo(tr);
+            td = $('<td>').attr('colspan', 8).addClass('title').appendTo(tr);
+            $('<span>').addClass('btn prev').html('&lt;').appendTo(td);
+            $('<span>').addClass('txt').appendTo(td).html(
+                this._pad0(datetime.getFullYear()) + '/' +
+                this._pad0(datetime.getMonth() + 1)
+            );
+            $('<span>').addClass('btn next').html('&gt;').appendTo(td);
 
-            var t = now.getFullYear() + '/' + this._pad0(now.getMonth() + 1);
-            $('<span>').addClass('btn').addClass('prev').html('<').appendTo(td);
-            $('<span>').addClass('txt').html(t).appendTo(td);
-            $('<span>').addClass('btn').addClass('next').html('>').appendTo(td);
-
+            // week days row
             tr = $('<tr>').appendTo(tbl);
-            for (var i = 0; i < 7; i++) $('<th>').html(this.l10n.weekNames[i]).appendTo(tr);
-
-
-            for (var i = 0; i < 35; i++) {
-                if (i % 7 == 0) tr = $('<tr>').appendTo(tbl);
-                var d = new Date(date - 0 + i * this.dayMs);
-                td = $('<td>').html(this._pad0(d.getDate())).appendTo(tr);
-                if (now.getMonth() != d.getMonth()) td.addClass('not-this-month');
+            for (var i = 0; i < 8; i++) {
+                td = $('<td>').addClass('h').appendTo(tr);
+                if (i > 0) td.html(this.l10n.weekNames[i - 1]);
             }
 
+            sm.setDate(sm.getDate() - sm.getDay());
+
+            for (var i = 0; i < rows; i++) {
+                tr = $('<tr>').appendTo(tbl);
+                td = $('<td>').appendTo(tr).attr('rowspan', 2).addClass('l').html(this._pad0(i));
+                for (var j = 0; j < 7; j++) {
+                    td = $('<td>').appendTo(tr).html(
+                        this._pad0(sm.getMonth() + 1) + '/' +
+                        this._pad0(sm.getDate())
+                    );
+                    if (sm.getMonth() != datetime.getMonth())
+                        td.addClass('gray');
+                    sm.setDate(sm.getDate() + 1);
+                }
+                tr = $('<tr>').appendTo(tbl);
+                for (var j = 0; j < 7; j++) {
+                    $('<td>').addClass('cell').appendTo(tr);
+                }
+            }
             return tbl;
+
         },
-        _showMonthlyAppointments: function (datetime) {
+        _bindMonthlyEvent: function () {
+            this._on(this.content.find('.btn.prev'), {
+                click: function () {
+                    this.date.setMonth(this.date.getMonth() - 1);
+                    this.monthlyView();
+                }
+            });
+            this._on(this.content.find('.btn.next'), {
+                click: function () {
+                    this.date.setMonth(this.date.getMonth() + 1);
+                    this.monthlyView();
+                }
+            });
+        },
+        _showMonthlySchedules: function (datetime) {
 
         },
         _yearlyView: function (year) {
@@ -630,6 +679,25 @@
         endOfWeek: function (date, clone) {
             if (!!clone) date = new Date(date);
             date.setDate(date.getDate() - 0 + (6 - date.getDay()));
+            date.setHours(23);
+            date.setMinutes(59);
+            date.setSeconds(59);
+            date.setMilliseconds(999);
+            return date;
+        },
+        beginOfMonth: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setDate(1);
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            return date;
+        },
+        endOfMonth: function (date, clone) {
+            if (!!clone) date = new Date(date);
+            date.setMonth(date.getMonth() + 1);
+            date.setDate(0);
             date.setHours(23);
             date.setMinutes(59);
             date.setSeconds(59);
