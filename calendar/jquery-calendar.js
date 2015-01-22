@@ -601,7 +601,7 @@
                     rowEndIdx = Math.floor(idx / 7) * 7 + 6;
                     if (rowEndIdx > eidx)
                         cols = eidx - idx + 1;
-                    idx += cols;
+
 
                     var td = $('.mcal')
                         .find('tr:eq(' + (row * 2 + 3) + ')')
@@ -613,6 +613,10 @@
 
                     if (cols > 1) {
                         el.css('width', cols + '00%');
+                        if (cols - 3 > 0)
+                            el.css('padding-right', (cols - 3) + 'px');
+                        if (idx != sidx)
+                            el.html('... ' + schedule.subject);
                     }
 
                     for (var j = 1; j < cols; j++) {
@@ -620,7 +624,7 @@
                         $('<div>').addClass('sholder').appendTo(td);
                     }
 
-
+                    idx += cols;
                 }
 
 
