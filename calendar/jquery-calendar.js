@@ -450,7 +450,7 @@
                 var el = $(e.target);
                 if (el.hasClass('cell')) {
                     if (this.event && this.event.onAddSchedule) {
-                        var d = this.beginOfWeek(this.date);
+                        var d = this.beginOfWeek(this.date, true);
                         d.setDate(d.getDate() + el.parent().index());
                         d.setHours(el.index());
                         this.event.onAddSchedule(d);
@@ -552,6 +552,22 @@
                 this.date.setMonth(this.date.getMonth() + 1);
                 this.monthlyView();
             });
+            this._on(this.content.find('.mcal'), 'click', function (e) {
+                var el = $(e.target);
+                if (el.hasClass('cell')) {
+                    if (this.event && this.event.onAddSchedule) {
+                        var d = this.beginOfMonth(this.date, true);
+                        var row = Math.floor((el.parent().index() - 3) / 2);
+                        var col = el.index();
+                        d.setDate(d.getDate() + row * 7 + col - d.getDay());
+                        d.setHours(8);
+                        this.event.onAddSchedule(d);
+                    }
+                } else if (el.hasClass('schedule')) {
+                    this.event && this.event.onViewSchedule &&
+                    this.event.onViewSchedule(el.data('schedule'));
+                }
+            });
         },
         _showMonthlySchedules: function (datetime, schedules) {
             var that = this;
@@ -568,7 +584,7 @@
                 validSchedules.push(schedule)
             });
 
-            validSchedules.sort(function(a, b) {
+            validSchedules.sort(function (a, b) {
                 return a.start - b.start;
             });
 
@@ -591,14 +607,12 @@
                         .find('tr:eq(' + (row * 2 + 3) + ')')
                         .find('td:eq(' + col + ')');
 
-                    el = $('<div>').html(
-                        that._dateString(schedule.start) + ' ~ ' +
-                        that._dateString(schedule.end)
-                    ).addClass('schedule').appendTo(td);
+                    el = $('<div>').html(schedule.subject)
+                        .data('schedule', schedule)
+                        .addClass('schedule').appendTo(td);
 
                     if (cols > 1) {
                         el.css('width', cols + '00%');
-                        //el.css('padding-left', (cols - 1) + 'px');
                     }
 
                     for (var j = 1; j < cols; j++) {
