@@ -27,11 +27,9 @@
                 var button = $('<button>')
                     .addClass('button')
                     .html(name).appendTo(buttonSet);
-                that._on(button, {
-                    click: function (e) {
-                        fn(e, this);
-                        this._close();
-                    }
+                that._on(button, 'click', function (e) {
+                    fn(e, this);
+                    this._close();
                 });
             });
         },
@@ -63,10 +61,8 @@
         _initEventHandler: function () {
             var btn = this.wrapper.find('.dlg_close_btn');
 
-            this._on(btn, {
-                click: function () {
-                    this._close();
-                }
+            this._on(btn, 'click', function () {
+                this._close();
             });
         },
         show: function (options) {

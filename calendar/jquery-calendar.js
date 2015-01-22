@@ -57,32 +57,26 @@
         _createLegendButtons: function () {
             var day = $('<button>').appendTo(this.legend).html('每日')
                 .addClass('button');
-            this._on(day, {
-                click: function (e) {
-                    this.content.html('');
-                    this.viewType = 'daily';
-                    this.show();
-                }
+            this._on(day, 'click', function (e) {
+                this.content.html('');
+                this.viewType = 'daily';
+                this.show();
             });
 
             var week = $('<button>').appendTo(this.legend).html('每周')
                 .addClass('button');
-            this._on(week, {
-                click: function (e) {
-                    this.content.html('');
-                    this.viewType = 'weekly';
-                    this.show();
-                }
+            this._on(week, 'click', function (e) {
+                this.content.html('');
+                this.viewType = 'weekly';
+                this.show();
             });
 
             var month = $('<button>').appendTo(this.legend).html('每月')
                 .addClass('button');
-            this._on(month, {
-                click: function (e) {
-                    this.content.html('');
-                    this.viewType = 'monthly';
-                    this.show();
-                }
+            this._on(month, 'click', function (e) {
+                this.content.html('');
+                this.viewType = 'monthly';
+                this.show();
             });
         },
         onAddSchedule: function (fn) {
@@ -157,53 +151,35 @@
             el.scrollTop(this._scrollTop);
         },
         _bindDailyEvent: function () {
-            this._on(this.element.find('.btn.prev'), {
-                click: function (e) {
-                    var d = new Date(this.date);
-                    d.setDate(d.getDate() - 1);
-                    this.dailyView(d);
-                }
+            this._on(this.element.find('.btn.prev'), 'click', function (e) {
+                var d = new Date(this.date);
+                d.setDate(d.getDate() - 1);
+                this.dailyView(d);
             });
-            this._on(this.element.find('.btn.next'), {
-                click: function (e) {
-                    var d = new Date(this.date);
-                    d.setDate(d.getDate() + 1);
-                    this.dailyView(d);
-                }
+            this._on(this.element.find('.btn.next'), 'click', function (e) {
+                var d = new Date(this.date);
+                d.setDate(d.getDate() + 1);
+                this.dailyView(d);
             });
-            this._on(this.element.find('.dcal'), {
-                click: function (e) {
-                    var el = $(e.target);
-                    if (el.hasClass('quarter')) {
-                        if (this.event && this.event.onAddSchedule) {
-                            var mins = el.index() * 30;
-                            var hour = Math.floor(mins / 60), min = mins % 60;
+            this._on(this.element.find('.dcal'), 'click', function (e) {
+                var el = $(e.target);
+                if (el.hasClass('quarter')) {
+                    if (this.event && this.event.onAddSchedule) {
+                        var mins = el.index() * 30;
+                        var hour = Math.floor(mins / 60), min = mins % 60;
 
-                            var d = new Date(this.date);
-                            d.setHours(hour);
-                            d.setMinutes(min);
-                            d = new Date(d - d % 60000);
+                        var d = new Date(this.date);
+                        d.setHours(hour);
+                        d.setMinutes(min);
+                        d = new Date(d - d % 60000);
 
-                            this.event.onAddSchedule(d);
-                        }
-                    } else if (el.hasClass('schedule') || el.hasClass('span-schedule')) {
-                        this.event && this.event.onViewSchedule &&
-                        this.event.onViewSchedule(el.data('schedule'));
+                        this.event.onAddSchedule(d);
                     }
+                } else if (el.hasClass('schedule') || el.hasClass('span-schedule')) {
+                    this.event && this.event.onViewSchedule &&
+                    this.event.onViewSchedule(el.data('schedule'));
                 }
             });
-            //this._on(this.element.find('.dcal .time-scroll'), {
-            //    scroll: function (e) {
-            //        var scroll = $(e.target);
-            //        var st = scroll.get(0).scrollTop;
-            //        this._scrollTop = st;
-            //        if (st > 0) {
-            //            this.element.find('.dcal .top').addClass('bshadow');
-            //        } else {
-            //            this.element.find('.dcal .top').removeClass('bshadow');
-            //        }
-            //    }
-            //});
         },
         _showDailySchedules: function (datetime, schedules) {
             var that = this;
@@ -460,22 +436,17 @@
             }
         },
         _bindWeeklyEvents: function () {
-            this._on(this.content.find('.btn.prev'), {
-                click: function () {
+            this._on(this.content.find('.btn.prev'), 'click', function () {
                     var d = new Date(this.date - this.dayMs * 7);
                     this.weeklyView(d);
-                }
             });
 
-            this._on(this.content.find('.btn.next'), {
-                click: function () {
+            this._on(this.content.find('.btn.next'), 'click', function () {
                     var d = new Date(this.date - 0 + this.dayMs * 7);
                     this.weeklyView(d);
-                }
             });
 
-            this._on(this.content.find('.wcal'), {
-                click: function (e) {
+            this._on(this.content.find('.wcal'), 'click', function (e) {
                     var el = $(e.target);
                     if (el.hasClass('cell')) {
                         if (this.event && this.event.onAddSchedule) {
@@ -488,7 +459,6 @@
                         this.event && this.event.onViewSchedule &&
                         this.event.onViewSchedule(el.data('schedule'));
                     }
-                }
             });
         },
         monthlyView: function (datetime) {
@@ -567,17 +537,14 @@
 
         },
         _bindMonthlyEvent: function () {
-            this._on(this.content.find('.btn.prev'), {
-                click: function () {
+            this._on(this.content.find('.btn.prev'), 'click', function () {
                     this.date.setMonth(this.date.getMonth() - 1);
                     this.monthlyView();
                 }
-            });
-            this._on(this.content.find('.btn.next'), {
-                click: function () {
-                    this.date.setMonth(this.date.getMonth() + 1);
-                    this.monthlyView();
-                }
+            );
+            this._on(this.content.find('.btn.next'), 'click', function () {
+                this.date.setMonth(this.date.getMonth() + 1);
+                this.monthlyView();
             });
         },
         _showMonthlySchedules: function (datetime) {
