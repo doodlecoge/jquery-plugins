@@ -264,17 +264,19 @@
     width: 100%;
     border-spacing: 0;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .mcal td {
     border: 1px solid #ccd;
     text-align: center;
+    margin: 0px;
+    padding: 0px;
 }
 
 .mcal td.title {
     line-height: 50px;
     font-size: 24px;
-
 }
 
 .mcal td.h {
@@ -283,7 +285,7 @@
 }
 
 .mcal td.l {
-    width: 50px;
+    width: 100px;
     vertical-align: top;
     background: #eee;
 }
@@ -293,5 +295,31 @@
 }
 
 .mcal td.cell {
-    height: 50px;
+    height: 30px;
+    vertical-align: top;
+    padding-bottom: 20px;
+}
+.mcal td.cell:hover {
+    background: #eee;
+}
+.mcal td.cell .schedule {
+    position: relative;
+    background: #eee;
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(#eee, #ddd);
+    background-repeat: repeat-x;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: keep-all;
+    cursor: pointer;
+    text-align: left;
+    border: 1px solid #444;
+    line-height: 20px;
+    margin-top: 2px;
+}
+
+.mcal td.cell .sholder {
+    height: 1px;
+    margin-top: 23px;
 }

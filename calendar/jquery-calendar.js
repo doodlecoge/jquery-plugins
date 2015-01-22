@@ -437,28 +437,28 @@
         },
         _bindWeeklyEvents: function () {
             this._on(this.content.find('.btn.prev'), 'click', function () {
-                    var d = new Date(this.date - this.dayMs * 7);
-                    this.weeklyView(d);
+                var d = new Date(this.date - this.dayMs * 7);
+                this.weeklyView(d);
             });
 
             this._on(this.content.find('.btn.next'), 'click', function () {
-                    var d = new Date(this.date - 0 + this.dayMs * 7);
-                    this.weeklyView(d);
+                var d = new Date(this.date - 0 + this.dayMs * 7);
+                this.weeklyView(d);
             });
 
             this._on(this.content.find('.wcal'), 'click', function (e) {
-                    var el = $(e.target);
-                    if (el.hasClass('cell')) {
-                        if (this.event && this.event.onAddSchedule) {
-                            var d = this.beginOfWeek(this.date);
-                            d.setDate(d.getDate() + el.parent().index());
-                            d.setHours(el.index());
-                            this.event.onAddSchedule(d);
-                        }
-                    } else if (el.hasClass('schedule')) {
-                        this.event && this.event.onViewSchedule &&
-                        this.event.onViewSchedule(el.data('schedule'));
+                var el = $(e.target);
+                if (el.hasClass('cell')) {
+                    if (this.event && this.event.onAddSchedule) {
+                        var d = this.beginOfWeek(this.date);
+                        d.setDate(d.getDate() + el.parent().index());
+                        d.setHours(el.index());
+                        this.event.onAddSchedule(d);
                     }
+                } else if (el.hasClass('schedule')) {
+                    this.event && this.event.onViewSchedule &&
+                    this.event.onViewSchedule(el.data('schedule'));
+                }
             });
         },
         monthlyView: function (datetime) {
@@ -495,7 +495,13 @@
             var sm = this.beginOfMonth(datetime, true);
             var em = this.endOfMonth(datetime, true);
             var rows = Math.ceil((em.getDate() + sm.getDay()) / 7),
-                tbl = $('<table>').addClass('mcal'), tr, td;
+                tbl = $('<table>').addClass('mcal'), tr, td, cols, col;
+
+            cols = $('<colgroup>').appendTo(tbl);
+            for (var i = 0; i < 8; i++) {
+                col = $('<col>').appendTo(cols);
+                if (i !== 0) col.css('width', '13.6%');
+            }
 
             // switch month button
             tr = $('<tr>').appendTo(tbl);
@@ -547,49 +553,64 @@
                 this.monthlyView();
             });
         },
-        _showMonthlySchedules: function (datetime) {
+        _showMonthlySchedules: function (datetime, schedules) {
+            var that = this;
+            var validSchedules = [];
+            var sm = this.beginOfMonth(datetime, true);
+            var em = this.endOfMonth(datetime, true);
+            var sidx, eidx, row, col, cols, el, rowEndIdx;
 
-        },
-        _yearlyView: function (year) {
-            year = year || new Date().getFullYear();
-            var now = new Date();
-            now.setFullYear(year);
-            now.setMonth(-1);
-            var tbl = $('<table>').addClass('ycal'), tr, td;
-            tr = $('<tr>').appendTo(tbl);
-            $('<td>').addClass('title').attr('colspan', 4).html(year).appendTo(tr);
-            for (var i = 0; i < 12; i++) {
-                if (i % 4 == 0) tr = $('<tr>').appendTo(tbl);
-                td = $('<td>').appendTo(tr);
-                now.setMonth(now.getMonth() + 1);
-                this._yearMonth(new Date(now)).appendTo(td);
-            }
-            return tbl;
-        },
-        _yearMonth: function (datetime) {
-            var current = new Date();
-            var date = datetime || current;
-            var title = this._pad0(date.getMonth() + 1);
-            var dd = new Date(date);
+            sm.setDate(sm.getDate() - sm.getDay());
+            em.setDate(em.getDate() + 6 - em.getDay());
 
-            dd.setDate(1);
-            dd.setDate(0 - dd.getDay());
+            $.each(schedules, function (i, schedule) {
+                if (schedule.end < sm || schedule.start > em) return;
+                validSchedules.push(schedule)
+            });
 
-            var tbl = $('<table>').addClass('ycal'), tr, td;
+            validSchedules.sort(function(a, b) {
+                return a.start - b.start;
+            });
 
-            tr = $('<tr>').appendTo(tbl);
-            $('<td>').attr('colspan', 7).addClass('title').html(title).appendTo(tr);
-            for (var i = 0; i < 7 * 5; i++) {
-                if (i % 7 == 0) tr = $('<tr>').appendTo(tbl);
-                dd.setDate(dd.getDate() + 1);
-                td = $('<td>').html(this._pad0(dd.getDate())).appendTo(tr);
-                if (dd.getMonth() != date.getMonth())
-                    td.addClass('none');
-                if (Math.floor(1 * dd / this.dayMs) ===
-                    Math.floor(1 * current / this.dayMs))
-                    td.addClass('cur');
-            }
-            return tbl;
+            $.each(validSchedules, function (i, schedule) {
+                var s = Math.max(schedule.start, sm);
+                var e = Math.min(schedule.end, em);
+                sidx = Math.floor((s - sm) / that.dayMs);
+                eidx = Math.floor((e - sm) / that.dayMs);
+
+                for (var idx = sidx; idx <= eidx;) {
+                    row = Math.floor(idx / 7);
+                    col = Math.floor(idx % 7);
+                    cols = 7 - col;
+                    rowEndIdx = Math.floor(idx / 7) * 7 + 6;
+                    if (rowEndIdx > eidx)
+                        cols = eidx - idx + 1;
+                    idx += cols;
+
+                    var td = $('.mcal')
+                        .find('tr:eq(' + (row * 2 + 3) + ')')
+                        .find('td:eq(' + col + ')');
+
+                    el = $('<div>').html(
+                        that._dateString(schedule.start) + ' ~ ' +
+                        that._dateString(schedule.end)
+                    ).addClass('schedule').appendTo(td);
+
+                    if (cols > 1) {
+                        el.css('width', cols + '00%');
+                        //el.css('padding-left', (cols - 1) + 'px');
+                    }
+
+                    for (var j = 1; j < cols; j++) {
+                        td = td.next();
+                        $('<div>').addClass('sholder').appendTo(td);
+                    }
+
+
+                }
+
+
+            });
         },
         _pad0: function (num, width) {
             width = width || 2;
