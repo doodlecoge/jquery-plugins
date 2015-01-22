@@ -574,7 +574,7 @@
             var validSchedules = [];
             var sm = this.beginOfMonth(datetime, true);
             var em = this.endOfMonth(datetime, true);
-            var sidx, eidx, row, col, cols, el, rowEndIdx;
+            var sidx, eidx, row, col, cols, el, rowEndIdx, inserted;
 
             sm.setDate(sm.getDate() - sm.getDay());
             em.setDate(em.getDate() + 6 - em.getDay());
@@ -585,7 +585,8 @@
             });
 
             validSchedules.sort(function (a, b) {
-                return a.start - b.start;
+                return a.start.getHours() * 60 + a.start.getMinutes() -
+                    b.start.getHours() * 60 + b.start.getMinutes();
             });
 
             $.each(validSchedules, function (i, schedule) {
@@ -609,7 +610,30 @@
 
                     el = $('<div>').html(schedule.subject)
                         .data('schedule', schedule)
-                        .addClass('schedule').appendTo(td);
+                        .addClass('schedule');
+
+                    // insert into right position
+                    var found = false;
+                    console.log(td.children());
+                    td.children().each(function (i, ch) {
+                        ch = $(ch);
+                        var d = ch.data('schedule').start;
+                        var mins = d.getHours() * 60 + d.getMinutes();
+                        var mins2 = schedule.start.getHours() * 60 +
+                            schedule.start.getMinutes();
+                        console.log(mins, mins2, mins2 < mins);
+                        if (mins2 < mins) {
+                            el.insertBefore(ch);
+                            found = true;
+                        }
+                        if(!found) return;
+                        console.log('==============found========')
+                        if (ch.data('el')) {
+                            console.log('xxxxxxxxxxxxxx')
+                            $('<div>').addClass('sholder').insertBefore(ch.data('el'));
+                        }
+                    });
+                    if(!found) el.appendTo(td);
 
                     if (cols > 1) {
                         el.css('width', cols + '00%');
@@ -621,7 +645,9 @@
 
                     for (var j = 1; j < cols; j++) {
                         td = td.next();
-                        $('<div>').addClass('sholder').appendTo(td);
+                        $('<div>').addClass('sholder')
+                            .data('schedule', schedule)
+                            .data('el', el).appendTo(td);
                     }
 
                     idx += cols;
