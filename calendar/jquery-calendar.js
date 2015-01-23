@@ -571,90 +571,148 @@
         },
         _showMonthlySchedules: function (datetime, schedules) {
             var that = this;
-            var validSchedules = [];
+            var validSchedules = {};
             var sm = this.beginOfMonth(datetime, true);
             var em = this.endOfMonth(datetime, true);
-            var sidx, eidx, row, col, cols, el, rowEndIdx, inserted;
+            var days = em.getDate() + sm.getDay() + 6 - em.getDay();
+            var rows = days / 7;
+            var sidx, eidx, row, col, cols, sd, ed, td, el;
 
             sm.setDate(sm.getDate() - sm.getDay());
             em.setDate(em.getDate() + 6 - em.getDay());
 
+            var sw, ew;
+
             $.each(schedules, function (i, schedule) {
-                if (schedule.end < sm || schedule.start > em) return;
-                validSchedules.push(schedule)
+                sw = new Date(sm);
+                ew = that.endOfWeek(sw, true);
+
+                for (var j = 0; j < rows; j++) {
+                    if (schedule.end > sw && schedule.start < ew) {
+                        validSchedules[j] = validSchedules[j] || [];
+                        validSchedules[j].push(schedule);
+                    }
+                    sw.setDate(sw.getDate() + 7);
+                    ew.setDate(ew.getDate() + 7);
+                }
             });
 
-            validSchedules.sort(function (a, b) {
-                return a.start.getHours() * 60 + a.start.getMinutes() -
-                    b.start.getHours() * 60 + b.start.getMinutes();
-            });
 
-            $.each(validSchedules, function (i, schedule) {
-                var s = Math.max(schedule.start, sm);
-                var e = Math.min(schedule.end, em);
-                sidx = Math.floor((s - sm) / that.dayMs);
-                eidx = Math.floor((e - sm) / that.dayMs);
+            $.each(validSchedules, function (i, weekSchedules) {
+                weekSchedules.sort(function (a, b) {
+                    return a.start.getHours() * 60 + a.start.getMinutes() -
+                        b.start.getHours() * 60 + b.start.getMinutes();
+                });
 
-                for (var idx = sidx; idx <= eidx;) {
-                    row = Math.floor(idx / 7);
-                    col = Math.floor(idx % 7);
-                    cols = 7 - col;
-                    rowEndIdx = Math.floor(idx / 7) * 7 + 6;
-                    if (rowEndIdx > eidx)
-                        cols = eidx - idx + 1;
+                sw = new Date(sm - 0 + i * 7 * that.dayMs);
+                ew = that.endOfWeek(sw, true);
 
+                $.each(weekSchedules, function (j, schedule) {
+                    sd = Math.max(schedule.start, sw);
+                    ed = Math.min(schedule.end, ew);
+                    sidx = Math.floor((sd - sw) / that.dayMs);
+                    eidx = Math.floor((ed - sw) / that.dayMs);
+                    cols = eidx - sidx + 1;
+                    row = i;
+                    col = sidx;
 
-                    var td = $('.mcal')
-                        .find('tr:eq(' + (row * 2 + 3) + ')')
-                        .find('td:eq(' + col + ')');
+                    td = getCell(row, col);
 
                     el = $('<div>').html(schedule.subject)
-                        .data('schedule', schedule)
-                        .addClass('schedule');
+                        .data('schedule', schedule).addClass('schedule');
 
-                    // insert into right position
-                    var found = false;
-                    console.log(td.children());
-                    td.children().each(function (i, ch) {
-                        ch = $(ch);
-                        var d = ch.data('schedule').start;
-                        var mins = d.getHours() * 60 + d.getMinutes();
-                        var mins2 = schedule.start.getHours() * 60 +
-                            schedule.start.getMinutes();
-                        console.log(mins, mins2, mins2 < mins);
-                        if (mins2 < mins) {
-                            el.insertBefore(ch);
-                            found = true;
-                        }
-                        if(!found) return;
-                        console.log('==============found========')
-                        if (ch.data('el')) {
-                            console.log('xxxxxxxxxxxxxx')
-                            $('<div>').addClass('sholder').insertBefore(ch.data('el'));
-                        }
-                    });
-                    if(!found) el.appendTo(td);
+                    if (cols == 1) el.appendTo(td);
+                    else appendSchedule(el, td, cols);
 
                     if (cols > 1) {
                         el.css('width', cols + '00%');
                         if (cols - 3 > 0)
                             el.css('padding-right', (cols - 3) + 'px');
-                        if (idx != sidx)
-                            el.html('... ' + schedule.subject);
+                        //if (idx != sidx)
+                        //    el.html('... ' + schedule.subject);
                     }
+                });
 
-                    for (var j = 1; j < cols; j++) {
-                        td = td.next();
-                        $('<div>').addClass('sholder')
-                            .data('schedule', schedule)
-                            .data('el', el).appendTo(td);
-                    }
-
-                    idx += cols;
-                }
-
-
+                sw.setDate(sw.getDate() + 7);
+                ew.setDate(ew.getDate() + 7);
             });
+
+            // functions
+            function getCell(row, col) {
+                return $('.mcal')
+                    .find('tr:eq(' + (row * 2 + 3) + ')')
+                    .find('td:eq(' + col + ')');
+            }
+
+            function appendSchedule(el, td, cols) {
+                var t = td, max = 0, n;
+                for (var i = 0; i < cols; i++) {
+                    max = Math.max(max, t.children().length);
+                    t = t.next();
+                }
+                t = td;
+                for (var i = 0; i < cols; i++) {
+                    n = max - t.children().length;
+                    if (i !== 0) n += 1;
+                    for (var j = 0; j < n; j++) {
+                        $('<div>').addClass('sholder').appendTo(t);
+                    }
+                    t = t.next();
+                }
+                el.appendTo(td);
+            }
+
+
+            //validSchedules.sort(function (a, b) {
+            //    return a.start.getHours() * 60 + a.start.getMinutes() -
+            //        b.start.getHours() * 60 + b.start.getMinutes();
+            //});
+
+            //$.each(validSchedules, function (i, schedule) {
+            //    var s = Math.max(schedule.start, sm);
+            //    var e = Math.min(schedule.end, em);
+            //    sidx = Math.floor((s - sm) / that.dayMs);
+            //    eidx = Math.floor((e - sm) / that.dayMs);
+            //
+            //    for (var idx = sidx; idx <= eidx;) {
+            //        row = Math.floor(idx / 7);
+            //        col = Math.floor(idx % 7);
+            //        cols = 7 - col;
+            //        rowEndIdx = Math.floor(idx / 7) * 7 + 6;
+            //        if (rowEndIdx > eidx)
+            //            cols = eidx - idx + 1;
+            //
+            //
+            //        var td = $('.mcal')
+            //            .find('tr:eq(' + (row * 2 + 3) + ')')
+            //            .find('td:eq(' + col + ')');
+            //
+            //        el = $('<div>').html(schedule.subject)
+            //            .data('schedule', schedule)
+            //            .addClass('schedule');
+            //
+            //        el.appendTo(td);
+            //
+            //        if (cols > 1) {
+            //            el.css('width', cols + '00%');
+            //            if (cols - 3 > 0)
+            //                el.css('padding-right', (cols - 3) + 'px');
+            //            if (idx != sidx)
+            //                el.html('... ' + schedule.subject);
+            //        }
+            //
+            //        for (var j = 1; j < cols; j++) {
+            //            td = td.next();
+            //            $('<div>').addClass('sholder')
+            //                .data('schedule', schedule)
+            //                .data('el', el).appendTo(td);
+            //        }
+            //
+            //        idx += cols;
+            //    }
+            //
+            //
+            //});
         },
         _pad0: function (num, width) {
             width = width || 2;
