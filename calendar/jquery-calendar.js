@@ -310,7 +310,8 @@
             var d = new Date(datetime - this.dayMs * datetime.getDay());
             for (var i = 0; i < 7; i++) {
                 var txt = this.l10n.weekNames[i] + '(' + this._dateString(d) + ')';
-                $('<div>').addClass('wday').appendTo(wdays).html(txt);
+                var tt = $('<div>').addClass('wday').appendTo(wdays);
+                $('<a>').attr('href', 'javascript:;').html(txt).appendTo(tt);
                 $('<div>').addClass('day').appendTo(spans);
                 d.setDate(d.getDate() + 1);
             }
@@ -458,6 +459,15 @@
                 } else if (el.hasClass('schedule')) {
                     this.event && this.event.onViewSchedule &&
                     this.event.onViewSchedule(el.data('schedule'));
+                } else if (e.target.nodeName == 'A') {
+                    var m = el.html().match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+                    this.dailyView(
+                        new Date(
+                            parseInt(m[1]),
+                            parseInt(m[2]) - 1,
+                            parseInt(m[3])
+                        )
+                    );
                 }
             });
         },
@@ -568,7 +578,7 @@
                 } else if (el.hasClass('schedule')) {
                     this.event && this.event.onViewSchedule &&
                     this.event.onViewSchedule(el.data('schedule'));
-                } else if(e.target.nodeName == 'A') {
+                } else if (e.target.nodeName == 'A') {
                     var match0 = this.content.find('span.txt').html()
                         .match(/(\d{4})\/(\d{2})/);
                     var match1 = el.html().match(/(\d{1,2})\/(\d{1,2})/);
@@ -583,7 +593,7 @@
                     dt.setMonth(m1 - 1);
                     dt.setDate(d);
 
-                    if(m0 - m1 == -11) {
+                    if (m0 - m1 == -11) {
                         dt.setFullYear(y - 1);
                     }
 

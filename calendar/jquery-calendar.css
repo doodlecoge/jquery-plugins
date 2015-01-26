@@ -152,6 +152,16 @@
     box-sizing: border-box;
 }
 
+.wcal .wdays .wday a {
+    text-decoration: none;
+    color: #000;
+}
+
+.wcal .wdays .wday a:hover {
+    text-decoration: underline;
+    color: #22f;
+}
+
 .wcal .spans {
     margin-left: 100px;
     border-left: 1px solid #ccd;
