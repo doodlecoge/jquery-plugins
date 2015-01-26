@@ -654,8 +654,20 @@
                         schedule.subject
                     ).data('schedule', schedule).addClass('schedule');
 
+                    var sd = that.beginOfDay(schedule.start, true);
+                    var ed = that.endOfDay(schedule.end, true);
+
+                    if (sd < sw) {
+                        el.css('border-left', '1px dashed transparent');
+                    }
+                    if (ed > ew) {
+                        el.css('border-right', '1px dashed transparent');
+                    }
+
                     if (cols == 1) el.appendTo(td);
-                    else appendSchedule(el, td, cols);
+                    else {
+                        appendSchedule(el, td, cols);
+                    }
 
                     if (cols > 1) {
                         el.css('width', cols + '00%');
