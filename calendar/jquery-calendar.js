@@ -601,7 +601,7 @@
             $.each(validSchedules, function (i, weekSchedules) {
                 weekSchedules.sort(function (a, b) {
                     return a.start.getHours() * 60 + a.start.getMinutes() -
-                        b.start.getHours() * 60 + b.start.getMinutes();
+                        b.start.getHours() * 60 - b.start.getMinutes();
                 });
 
                 sw = new Date(sm - 0 + i * 7 * that.dayMs);
@@ -615,11 +615,12 @@
                     cols = eidx - sidx + 1;
                     row = i;
                     col = sidx;
-
                     td = getCell(row, col);
-
-                    el = $('<div>').html(schedule.subject)
-                        .data('schedule', schedule).addClass('schedule');
+                    el = $('<div>').html(
+                        that._pad0(schedule.start.getHours()) + ':' +
+                        that._pad0(schedule.start.getMinutes()) + ' ' +
+                        schedule.subject
+                    ).data('schedule', schedule).addClass('schedule');
 
                     if (cols == 1) el.appendTo(td);
                     else appendSchedule(el, td, cols);
@@ -628,8 +629,6 @@
                         el.css('width', cols + '00%');
                         if (cols - 3 > 0)
                             el.css('padding-right', (cols - 3) + 'px');
-                        //if (idx != sidx)
-                        //    el.html('... ' + schedule.subject);
                     }
                 });
 
@@ -661,58 +660,6 @@
                 }
                 el.appendTo(td);
             }
-
-
-            //validSchedules.sort(function (a, b) {
-            //    return a.start.getHours() * 60 + a.start.getMinutes() -
-            //        b.start.getHours() * 60 + b.start.getMinutes();
-            //});
-
-            //$.each(validSchedules, function (i, schedule) {
-            //    var s = Math.max(schedule.start, sm);
-            //    var e = Math.min(schedule.end, em);
-            //    sidx = Math.floor((s - sm) / that.dayMs);
-            //    eidx = Math.floor((e - sm) / that.dayMs);
-            //
-            //    for (var idx = sidx; idx <= eidx;) {
-            //        row = Math.floor(idx / 7);
-            //        col = Math.floor(idx % 7);
-            //        cols = 7 - col;
-            //        rowEndIdx = Math.floor(idx / 7) * 7 + 6;
-            //        if (rowEndIdx > eidx)
-            //            cols = eidx - idx + 1;
-            //
-            //
-            //        var td = $('.mcal')
-            //            .find('tr:eq(' + (row * 2 + 3) + ')')
-            //            .find('td:eq(' + col + ')');
-            //
-            //        el = $('<div>').html(schedule.subject)
-            //            .data('schedule', schedule)
-            //            .addClass('schedule');
-            //
-            //        el.appendTo(td);
-            //
-            //        if (cols > 1) {
-            //            el.css('width', cols + '00%');
-            //            if (cols - 3 > 0)
-            //                el.css('padding-right', (cols - 3) + 'px');
-            //            if (idx != sidx)
-            //                el.html('... ' + schedule.subject);
-            //        }
-            //
-            //        for (var j = 1; j < cols; j++) {
-            //            td = td.next();
-            //            $('<div>').addClass('sholder')
-            //                .data('schedule', schedule)
-            //                .data('el', el).appendTo(td);
-            //        }
-            //
-            //        idx += cols;
-            //    }
-            //
-            //
-            //});
         },
         _pad0: function (num, width) {
             width = width || 2;
@@ -724,7 +671,8 @@
             return num;
         },
         _dateString: function (date) {
-            return date.getFullYear() + '/' + this._pad0(date.getMonth() + 1) + '/' + this._pad0(date.getDate());
+            return date.getFullYear() + '/' + this._pad0(date.getMonth() + 1) +
+                '/' + this._pad0(date.getDate());
         },
         _appointments: function () {
             return this.options.appointments || [];
