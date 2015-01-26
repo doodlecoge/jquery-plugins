@@ -31,8 +31,6 @@
                     this.monthlyView();
                     break;
             }
-
-            this._updateButtonState();
         },
         _updateButtonState: function () {
             this.legend.find('button').removeClass('blue');
@@ -115,6 +113,7 @@
                 that._bindDailyEvent();
                 that._showDailySchedules(datetime, schedules);
                 that._scrollDailyView();
+                that._updateButtonState();
             }
         },
         _dailyView: function (datetime) {
@@ -293,6 +292,7 @@
                 that._weeklyView(datetime).appendTo(that.content);
                 that._showWeeklySchedule(datetime, schedules);
                 that._bindWeeklyEvents();
+                that._updateButtonState();
             }
         },
         _weeklyView: function (datetime) {
@@ -489,6 +489,7 @@
                 //that._bindDailyEvent();
                 that._bindMonthlyEvent();
                 that._showMonthlySchedules(datetime, schedules);
+                that._updateButtonState();
             }
         },
         _monthlyView: function (datetime) {
@@ -526,7 +527,8 @@
                 tr = $('<tr>').appendTo(tbl);
                 td = $('<td>').appendTo(tr).attr('rowspan', 2).addClass('l').html(this._pad0(i));
                 for (var j = 0; j < 7; j++) {
-                    td = $('<td>').appendTo(tr).html(
+                    td = $('<td>').appendTo(tr);
+                    $('<a>').attr('href', 'javascript:;').appendTo(td).html(
                         this._pad0(sm.getMonth() + 1) + '/' +
                         this._pad0(sm.getDate())
                     );
@@ -566,6 +568,26 @@
                 } else if (el.hasClass('schedule')) {
                     this.event && this.event.onViewSchedule &&
                     this.event.onViewSchedule(el.data('schedule'));
+                } else if(e.target.nodeName == 'A') {
+                    var match0 = this.content.find('span.txt').html()
+                        .match(/(\d{4})\/(\d{2})/);
+                    var match1 = el.html().match(/(\d{1,2})\/(\d{1,2})/);
+                    var dt = new Date(this.date);
+
+                    var y = parseInt(match0[1]);
+                    var m0 = parseInt(match0[2]);
+                    var m1 = parseInt(match1[1]);
+                    var d = parseInt(match1[2]);
+
+                    dt.setFullYear(y);
+                    dt.setMonth(m1 - 1);
+                    dt.setDate(d);
+
+                    if(m0 - m1 == -11) {
+                        dt.setFullYear(y - 1);
+                    }
+
+                    this.dailyView(dt);
                 }
             });
         },
