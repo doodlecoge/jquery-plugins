@@ -184,31 +184,23 @@
             var that = this;
             var dailyApmts = [];
             var spanApmts = [];
+            var sd = this.beginOfDay(datetime, true);
+            var ed = this.endOfDay(datetime, true);
             $.each(schedules, function (i, apmt) {
-                var s = new Date(apmt.start);
-                var e = new Date(apmt.end);
-                var days = datetime.getFullYear() + datetime.getMonth() + datetime.getDate();
-                var day0 = s.getFullYear() + s.getMonth() + s.getDate();
-                var day1 = e.getFullYear() + e.getMonth() + e.getDate();
-                if (days < day0 || days > day1) return;
-                if (days != day0 || days != day1) spanApmts.push(apmt);
+                var s = apmt.start;
+                var e = apmt.end;
+                if(s > ed || e < sd) return;
+                if(s < sd || e > ed) spanApmts.push(apmt);
                 else dailyApmts.push(apmt);
             });
             $.each(spanApmts, function (i, apmt) {
-                var s = new Date(apmt.start);
-                var e = new Date(apmt.end);
-                var d = new Date(datetime);
-                d.setHours(0);
-                d.setMinutes(0);
-                d.setSeconds(0);
                 var ml = 0, mr = 0;
-                if (s > d) {
-                    var mins = (s - d) / 60000;
+                if (apmt.start > sd) {
+                    var mins = (apmt.start - sd) / 60000;
                     ml = 100 * mins / 24 / 60;
                 }
-                d.setDate(d.getDate() + 1);
-                if (e < d) {
-                    var mins = (d - e) / 60000;
+                if (apmt.end < ed) {
+                    var mins = (ed - apmt.end) / 60000;
                     mr = 100 * mins / 24 / 60;
                 }
                 $('<div>').html(apmt.subject)
