@@ -1,0 +1,92 @@
+.split-win {
+    padding: 14px 7px;
+    background: #f5f5f5;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.split-win .wrapper {
+    height: 100%;
+    position: relative;
+    margin: 8px 7px;
+    top: -8px;
+}
+
+.split-win .wrapper .col {
+    width: 50%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.split-win .wrapper .l {
+    left: -5px;
+    position: absolute;
+}
+
+.split-win .wrapper .r {
+    right: -5px;
+    position: absolute;
+}
+
+.split-win .wrapper .win {
+    position: absolute;
+    border: 1px solid #ccc;
+    width: 100%;
+    background: #fff;
+    box-shadow: inset 0 2px 5px #eee;
+}
+
+.split-win .wrapper .win textarea {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    resize: none;
+    width: 100%;
+    height: 100%;
+    font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+}
+
+.split-win .wrapper .win .label {
+    z-index: 2000;
+    border: 1px solid #f0f0f0;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 5px;
+    color: #888;
+}
+
+.split-win .wrapper .t {
+    top: -6px;
+    height: 40%;
+}
+
+.split-win .wrapper .b {
+    bottom: -6px;
+    height: 60%;
+}
+
+.split-win .wrapper .vh {
+    left: 50%;
+    width: 8px;
+    height: 100%;
+    position: absolute;
+    margin-left: -3px;
+    padding: 5px 0;
+    top: -5px;
+    z-index: 1000;
+    cursor: col-resize;
+    background: url("img/handle-v.png") 2px 50% no-repeat;
+}
+
+.split-win .wrapper .hh {
+    top: 40%;
+    width: 100%;
+    height: 8px;
+    position: absolute;
+    margin-top: -3px;
+    z-index: 1000;
+    cursor: row-resize;
+    background: url("img/handle-h.png") 50% 2px no-repeat;
+}

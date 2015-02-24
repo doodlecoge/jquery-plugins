@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../lib/jquery-plugin.css">
+    <link rel="stylesheet" href="jquery-menu.css">
+    <script type="text/javascript" src="../lib/jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="../lib/jquery-ui-core.js"></script>
+    <script type="text/javascript" src="jquery-menu.js"></script>
+</head>
+<body>
+<div id="c">
+    <ul id="menu">
+        <li>Spring</li>
+        <li>Struts</li>
+        <li>Hibernate
+            <ul>
+                <li>a quick brown fox jump over the lazy dog
+                    <ul>
+                        <li>a quick brown fox jump over the lazy dog</li>
+                        <li>bbbbbbb</li>
+                        <li>ccccccc</li>
+                    </ul>
+                </li>
+                <li>bbbbbbb</li>
+                <li>ccccccc
+                    <ul>
+                        <li>b quick arown fox jump over the lazy dog</li>
+                        <li>bbbbbbb</li>
+                        <li>ccccccc</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<script type="text/javascript">
+    $("#menu").menu();
+</script>
+</body>
+</html>

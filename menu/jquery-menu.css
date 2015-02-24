@@ -1,0 +1,49 @@
+.ui_menu {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #888;
+    position: absolute;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
+}
+
+.ui_menu li {
+    line-height: 25px;
+    overflow: visible;
+    padding: 0 20px 0 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    margin: -1px;
+    list-style: none;
+    vertical-align: middle;
+    white-space: nowrap;
+    word-break: keep-all;
+    /*text-overflow: ellipsis;*/
+    /*overflow: hidden;*/
+    position: relative;
+    /*width: 150px;*/
+}
+
+.ui_menu .item_active, .ui_menu .item_focus {
+    background: #ccc;
+    border: 1px solid #888;
+}
+.ui_menu .item_focus {
+    background: #888;
+}
+
+.ui_menu li span {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    text-align: center;
+    vertical-align: middle;
+    color: #f44;
+    font-weight: bold;
+}
+
+/*.ui_menu li:hover, .ui_menu li.active {*/
+/*background: #ccc;*/
+/*border-color: #888;*/
+/*}*/
