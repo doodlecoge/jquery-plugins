@@ -11,24 +11,30 @@
 </head>
 <body>
 <div id="c">
-    <ul id="menu">
-        <li>Spring</li>
-        <li>Struts</li>
-        <li>Hibernate
+    <ul id="menu" tabindex="1">
+        <li><a>Spring</a></li>
+        <li><a>Struts</a></li>
+        <li><a>Hibernate</a>
             <ul>
-                <li>a quick brown fox jump over the lazy dog
+                <li><a>a quick brown fox jump over the lazy dog</a>
                     <ul>
-                        <li>a quick brown fox jump over the lazy dog</li>
-                        <li>bbbbbbb</li>
-                        <li>ccccccc</li>
+                        <li><a>a quick brown fox jump over the lazy dog</a></li>
+                        <li><a>bbbbbbb</a>
+                            <ul>
+                                <li><a>c quick brown fox jump over the lazy dog</a></li>
+                                <li><a>bbbbbbb</a></li>
+                                <li><a>ccccccc</a></li>
+                            </ul>
+                        </li>
+                        <li><a>ccccccc</a></li>
                     </ul>
                 </li>
-                <li>bbbbbbb</li>
-                <li>ccccccc
+                <li><a>bbbbbbb</a></li>
+                <li><a>ccccccc</a>
                     <ul>
-                        <li>b quick arown fox jump over the lazy dog</li>
-                        <li>bbbbbbb</li>
-                        <li>ccccccc</li>
+                        <li><a>b quick arown fox jump over the lazy dog</a></li>
+                        <li><a>bbbbbbb</a></li>
+                        <li><a>ccccccc</a></li>
                     </ul>
                 </li>
             </ul>
@@ -36,7 +42,14 @@
     </ul>
 </div>
 <script type="text/javascript">
-    $("#menu").menu();
+    $("#menu").menu({
+        select: function (e) {
+            console.log('yyy');
+        }
+    });
+    $("#menu").on("menuselect", function () {
+        console.log('xxx');
+    });
 </script>
 </body>
 </html>

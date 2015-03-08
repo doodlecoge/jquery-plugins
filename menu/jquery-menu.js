@@ -14,18 +14,15 @@
                 .find('ul').addClass('ui_menu').hide();
 
             this._on({
-                "mouseenter li": function (e) {
+                "mouseenter a": function (e) {
                     e.stopPropagation();
                     var elem = $(e.currentTarget);
                     this.focus(elem);
                 },
-                "mouseleave li": function (e) {
+                "click a": function (e) {
                     e.stopPropagation();
-                    var elem = $(e.currentTarget);
-                    this._blur(elem);
-                },
-                "click li": function (e) {
-
+                    this._trigger("select", e);
+                    this.close();
                 }
             });
 
@@ -33,59 +30,57 @@
                 click: function (e) {
                     if ($(e.target).closest(this.element.find('.' + this.cls.menu)).length)
                         return;
-                    this._close(this.element);
+                    this.close();
                 }
             });
+
             this.refresh();
-        },
-        focus: function (elem) {
-            elem.addClass(this.cls.focus)
-                .removeClass(this.cls.active);
-            elem.siblings().removeClass(this.cls.active);
-            elem.parent().closest('li')
-                .addClass(this.cls.active)
-                .removeClass(this.cls.focus);
-            clearTimeout(this.timer);
-            this.timer = this._delay(function () {
-                this._close(elem);
-                this._open(elem);
-            }, this.delay);
-        },
-        _blur: function (elem) {
-            if (!elem) return;
-            clearTimeout(this.timer);
-            elem.removeClass(this.cls.focus);
-            this._close(elem);
         },
         refresh: function () {
             this.element.find('ul')
                 .hide()
                 .addClass(this.cls.menu)
                 .each(function () {
-                    $('<span>&gt;</span>').prependTo($(this).parent());
+                    $('<span>&gt;</span>').prependTo($(this).siblings('a'));
                 });
         },
-        _close: function (menu) {
-            if (!menu) return;
-            if (menu !== this.element) menu = menu.parent();
-            menu.find('.' + this.cls.menu)
-                .hide().end()
-                .find('.' + this.cls.active)
-                .not('.' + this.cls.focus)
+        focus: function (elem) {
+            // close sub menus at any depth
+            elem.parent().parent()
+                .find('.' + this.cls.menu).hide();
+
+            elem.parent().siblings().children('a')
+                .removeClass(this.cls.focus)
                 .removeClass(this.cls.active);
+
+            // focus current item
+            elem.addClass(this.cls.focus);
+
+            // open direct sub menu if any
+            this.openMenu(elem.parent());
+
+            // set parent item style
+            elem.parent().parent().siblings('a')
+                .removeClass(this.cls.focus)
+                .addClass(this.cls.active);
         },
-        _open: function (item) {
-            item.children('.ui_menu')
-                .show()
+        openMenu: function (elem) {
+            var menu = elem.children('.' + this.cls.menu);
+            menu.show()
                 .position({
-                    of: item,
+                    of: elem,
                     my: "left-1 top",
                     at: "right top"
-                });
+                })
+                .find('a')
+                .removeClass(this.cls.focus)
+                .removeClass(this.cls.active);
         },
-
+        close: function (elem) {
+            elem = elem || this.element;
+            elem.closest('.' + this.cls.menu).hide();
+        },
         _init: function () {
-            //this.element.show();
         }
     });
 })(jQuery);

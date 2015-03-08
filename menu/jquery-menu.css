@@ -7,12 +7,17 @@
 }
 
 .ui_menu li {
+    margin: -1px;
+    list-style: none;
+}
+
+.ui_menu li a {
+    display: block;
     line-height: 25px;
     overflow: visible;
     padding: 0 20px 0 20px;
     cursor: pointer;
     border: 1px solid transparent;
-    margin: -1px;
     list-style: none;
     vertical-align: middle;
     white-space: nowrap;
@@ -27,6 +32,7 @@
     background: #ccc;
     border: 1px solid #888;
 }
+
 .ui_menu .item_focus {
     background: #888;
 }
