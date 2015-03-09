@@ -10,7 +10,7 @@
             focus: "item_focus"
         },
         _create: function () {
-            this.element.addClass('ui_menu')
+            this.element.addClass('ui_menu').hide()
                 .find('ul').addClass('ui_menu').hide();
 
             this._on({
@@ -30,6 +30,7 @@
                 click: function (e) {
                     if ($(e.target).closest(this.element.find('.' + this.cls.menu)).length)
                         return;
+                    if (this.of && e.target == this.of.get(0)) return;
                     this.close();
                 }
             });
@@ -81,6 +82,19 @@
             elem.closest('.' + this.cls.menu).hide();
         },
         _init: function () {
+        },
+        positionTo: function (position, of) {
+            if (!of) {
+                of = position;
+                position = {
+                    of: of,
+                    my: "left top",
+                    at: "left bottom"
+                }
+            }
+            this.of = of;
+            this.element.show()
+                .position(position);
         }
     });
 })(jQuery);

@@ -8,9 +8,15 @@
     <script type="text/javascript" src="../lib/jquery-1.11.2.js"></script>
     <script type="text/javascript" src="../lib/jquery-ui-core.js"></script>
     <script type="text/javascript" src="jquery-menu.js"></script>
+    <style type="text/css">
+        #btn {
+            margin: 100px 0 0 200px;
+        }
+    </style>
 </head>
 <body>
 <div id="c">
+    <button id="btn">Button</button>
     <ul id="menu" tabindex="1">
         <li><a>Spring</a></li>
         <li><a>Struts</a></li>
@@ -49,6 +55,13 @@
     });
     $("#menu").on("menuselect", function () {
         console.log('xxx');
+    });
+
+    $(function () {
+        $("#btn").click(function (e) {
+            console.log(e);
+            $("#menu").menu('positionTo', $("#btn"));
+        });
     });
 </script>
 </body>
