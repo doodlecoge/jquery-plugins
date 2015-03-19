@@ -3,6 +3,7 @@
  */
 (function ($) {
     $.widget("ui.menu", {
+        zindex: 0,
         delay: 300,
         cls: {
             menu: "ui_menu",
@@ -66,16 +67,31 @@
                 .addClass(this.cls.active);
         },
         openMenu: function (elem) {
+            var pzidx = elem.parent().css('z-index');
+            if (typeof pzidx != 'number') pzidx = 0;
             var menu = elem.children('.' + this.cls.menu);
             menu.show()
+                .css('z-index', pzidx + 1)
                 .position({
                     of: elem,
                     my: "left-1 top",
                     at: "right top"
                 })
-                .find('a')
+                .children()
+                .children('a')
                 .removeClass(this.cls.focus)
                 .removeClass(this.cls.active);
+        },
+        open: function () {
+            this.element.show()
+                .children().children('a')
+                .removeClass(this.cls.focus)
+                .removeClass(this.cls.active);
+
+            this.element.find('.' + this.cls.menu).hide();
+
+            if (this.position)
+                this.element.position(this.position);
         },
         close: function (elem) {
             elem = elem || this.element;
@@ -83,18 +99,22 @@
         },
         _init: function () {
         },
-        positionTo: function (position, of) {
-            if (!of) {
-                of = position;
-                position = {
-                    of: of,
-                    my: "left top",
-                    at: "left bottom"
-                }
-            }
-            this.of = of;
-            this.element.show()
-                .position(position);
+        bindTo: function (elem, event, position) {
+            // remove old binding
+            if (this.position && this.position.of)
+                this._off(this.position.of);
+
+            this.position = position || {
+                my: "left top",
+                at: "left bottom",
+                of: elem
+            };
+            var events = {};
+            events[event] = function (e) {
+                e.stopPropagation();
+                this.open();
+            };
+            this._on(elem, events);
         }
     });
 })(jQuery);

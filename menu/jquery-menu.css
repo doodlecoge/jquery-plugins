@@ -4,6 +4,7 @@
     border: 1px solid #888;
     position: absolute;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
+    background: #fff;
 }
 
 .ui_menu li {
