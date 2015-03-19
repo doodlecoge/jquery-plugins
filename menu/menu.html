@@ -49,15 +49,13 @@
 </div>
 <script type="text/javascript">
     $("#menu").menu({
-        select: function (e) {
-            console.log(e.target);
-            console.log(e.currentTarget);
+        select: function (e, elem) {
+            console.log(elem);
         }
     });
 
-    $("#menu").on("menuselect", function (e) {
-        console.log(e.originalEvent.target);
-        console.log(e.originalEvent.currentTarget);
+    $("#menu").on("menuselect", function (e, elem) {
+        console.log(elem);
     });
 
     $("#menu").menu('bindTo', $("#btn"), 'click');

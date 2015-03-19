@@ -20,10 +20,17 @@
                     var elem = $(e.currentTarget);
                     this.focus(elem);
                 },
+                "mouseleave a": function (e) {
+                    e.stopPropagation();
+                    clearTimeout(this.timer);
+                },
                 "click a": function (e) {
                     e.stopPropagation();
-                    this._trigger("select", e);
+                    this._trigger("select", e, $(e.target));
                     this.close();
+                },
+                "keyup": function (e) {
+                    this.keypress(e);
                 }
             });
 
@@ -46,7 +53,11 @@
                     $('<span>&gt;</span>').prependTo($(this).siblings('a'));
                 });
         },
-        focus: function (elem) {
+        focus: function (elem, delay) {
+            this.current = elem.parent();
+
+            delay = typeof delay == 'boolean' ? delay : true;
+
             // close sub menus at any depth
             elem.parent().parent()
                 .find('.' + this.cls.menu).hide();
@@ -59,7 +70,13 @@
             elem.addClass(this.cls.focus);
 
             // open direct sub menu if any
-            this.openMenu(elem.parent());
+            if (delay)
+                this.timer = this._delay(function () {
+                    this.openMenu(elem.parent());
+                }, this.delay);
+            else {
+                this.openMenu(elem.parent());
+            }
 
             // set parent item style
             elem.parent().parent().siblings('a')
@@ -83,7 +100,7 @@
                 .removeClass(this.cls.active);
         },
         open: function () {
-            this.element.show()
+            this.element.show().focus()
                 .children().children('a')
                 .removeClass(this.cls.focus)
                 .removeClass(this.cls.active);
@@ -94,6 +111,7 @@
                 this.element.position(this.position);
         },
         close: function (elem) {
+            this.current = null;
             elem = elem || this.element;
             elem.closest('.' + this.cls.menu).hide();
         },
@@ -115,6 +133,56 @@
                 this.open();
             };
             this._on(elem, events);
+        },
+        keypress: function (e) {
+            switch (e.keyCode) {
+                case $.ui.keyCode.DOWN:
+                    this.next();
+                    break;
+                case $.ui.keyCode.UP:
+                    this.prev();
+                    break;
+                case $.ui.keyCode.RIGHT:
+                    console.log('================')
+                    this.nextMenu();
+                    break;
+                case $.ui.keyCode.LEFT:
+                    this.prevMenu();
+                    break
+                case $.ui.keyCode.ENTER:
+                    this._trigger("select", e, this.current.children('a'));
+                    this.close();
+                    break;
+            }
+        },
+        next: function () {
+            var li = this.current || this.element.children(':last');
+            if (li.length == 0) return;
+            if (li.nextAll().length == 0) li = li.parent().children(':first');
+            else li = li.next();
+            this.focus(li.children('a'), false);
+        },
+        prev: function () {
+            var li = this.current || this.element.children(':first');
+            if (li.length == 0)return;
+            if (li.index() == 0) li = li.parent().children(':last');
+            else li = li.prev();
+            this.focus(li.children('a'), false);
+        },
+        nextMenu: function () {
+            if (!this.current) return;
+            var menu = this.current.children('ul');
+            if (menu.length == 0) return;
+
+            if (menu.is(':hidden'))
+                this.openMenu(this.current);
+            else
+                this.focus(menu.children(':first').children('a'), false);
+        },
+        prevMenu: function () {
+            if (!this.current) return;
+            var li = this.current.parent().parent();
+            this.focus(li.children('a'), false);
         }
     });
 })(jQuery);
