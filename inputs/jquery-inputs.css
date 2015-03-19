@@ -1,0 +1,29 @@
+.inputs {
+    word-wrap: break-word;
+}
+
+.inputs input, .inputs span.W, .inputs span.item {
+    font-size: 16px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
+}
+
+.inputs input {
+    outline: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.inputs span.W {
+    display: none;
+}
+
+.inputs span.item {
+    display: inline-block;
+    line-height: 25px;
+    padding: 0 10px;
+    border-radius: 5px;
+    background: #eee;
+    margin: 0 5px 5px 0;
+}
+
