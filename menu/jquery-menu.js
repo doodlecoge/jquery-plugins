@@ -38,7 +38,8 @@
                 click: function (e) {
                     if ($(e.target).closest(this.element.find('.' + this.cls.menu)).length)
                         return;
-                    if (this.of && e.target == this.of.get(0)) return;
+                    if (this.position && e.target == this.position.of.get(0))
+                        return;
                     this.closeMenu();
                 }
             });
@@ -150,7 +151,6 @@
                     this.prev();
                     break;
                 case $.ui.keyCode.RIGHT:
-                    console.log('================')
                     this.nextMenu();
                     break;
                 case $.ui.keyCode.LEFT:
