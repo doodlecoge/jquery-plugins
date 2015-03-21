@@ -27,7 +27,7 @@
                 "click a": function (e) {
                     e.stopPropagation();
                     this._trigger("select", e, $(e.target));
-                    this.close();
+                    this.closeMenu();
                 },
                 "keyup": function (e) {
                     this.keypress(e);
@@ -39,7 +39,7 @@
                     if ($(e.target).closest(this.element.find('.' + this.cls.menu)).length)
                         return;
                     if (this.of && e.target == this.of.get(0)) return;
-                    this.close();
+                    this.closeMenu();
                 }
             });
 
@@ -101,6 +101,11 @@
                 .removeClass(this.cls.focus)
                 .removeClass(this.cls.active);
         },
+        closeMenu: function (elem) {
+            this.current = null;
+            elem = elem || this.element;
+            elem.closest('.' + this.cls.menu).hide();
+        },
         open: function () {
             this.element.show().focus()
                 .children().children('a')
@@ -112,14 +117,12 @@
             if (this.position)
                 this.element.position(this.position);
         },
-        close: function (elem) {
-            this.current = null;
-            elem = elem || this.element;
-            elem.closest('.' + this.cls.menu).hide();
+        close: function () {
+            this.element.hide();
         },
         _init: function () {
         },
-        bindTo: function (elem, event, position) {
+        bindTo: function (elem, position, event) {
             // remove old binding
             if (this.position && this.position.of)
                 this._off(this.position.of);
@@ -129,6 +132,8 @@
                 at: "left bottom",
                 of: elem
             };
+
+            if (!event) return;
             var events = {};
             events[event] = function (e) {
                 e.stopPropagation();
@@ -153,15 +158,17 @@
                     break
                 case $.ui.keyCode.ENTER:
                     this._trigger("select", e, this.current.children('a'));
-                    this.close();
+                    this.closeMenu();
                     break;
             }
         },
         next: function () {
             var li = this.current || this.element.children(':last');
             if (li.length == 0) return;
-            if (li.nextAll().length == 0) li = li.parent().children(':first');
-            else li = li.next();
+            if (li.nextAll().length == 0)
+                li = li.parent().children(':first');
+            else
+                li = li.next();
             this.focus(li.children('a'), false);
         },
         prev: function () {
