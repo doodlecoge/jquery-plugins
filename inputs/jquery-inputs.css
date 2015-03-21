@@ -2,7 +2,7 @@
     word-wrap: break-word;
 }
 
-.inputs input, .inputs span.W, .inputs span.item {
+.inputs input, .inputs span.w, .inputs span.item {
     font-size: 16px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'Droid Sans Mono', monospace;
 }
@@ -14,16 +14,28 @@
     margin: 0;
 }
 
-.inputs span.W {
+.inputs span.w {
     display: none;
 }
 
 .inputs span.item {
     display: inline-block;
-    line-height: 25px;
-    padding: 0 10px;
+
+    padding: 5px 10px;
     border-radius: 5px;
     background: #eee;
     margin: 0 5px 5px 0;
+}
+
+.inputs span.item .x {
+    margin-left: 5px;
+    color: #f66;
+    font-weight: bold;
+    height: 10px;
+    text-decoration: none;
+}
+
+.inputs span.item .x:hover {
+    color: #f00;
 }
 

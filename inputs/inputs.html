@@ -9,18 +9,33 @@
     <script type="text/javascript" src="../lib/jquery-ui-core.js"></script>
     <script type="text/javascript" src="jquery-inputs.js"></script>
     <style type="text/css">
-
+        label {
+            background: #ccc;
+            font-family: Courier, monospace;
+            font-size: 100px;
+        }
     </style>
 </head>
 <body>
 
-<div id="inputs">
+<div id="inputs"></div>
 
-</div>
+<hr/>
+
+<label>x</label>
+<label>X</label>
 
 <script type="text/javascript">
     $(function () {
-        $("#inputs").inputs();
+        $("#inputs").inputs()
+                .inputs('addItem', 'java')
+                .inputs('addItem', 'spring')
+                .inputs('addItem', 'hibernate')
+                .inputs('addItem', 'python')
+                .inputs('addItem', 'javascript')
+                .inputs('addItem', 'MicroSoft Word')
+                .inputs('addItem', 'Oracle')
+        ;
     });
 </script>
 </body>

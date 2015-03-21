@@ -10,7 +10,7 @@
             this.input = $('<input>').attr('type', 'text')
                 .appendTo(this.wrapper);
 
-            this.W = $('<span>').addClass('W').appendTo(this.wrapper);
+            this.w = $('<span>').addClass('w').appendTo(this.wrapper);
 
             this._initEvents();
         },
@@ -19,7 +19,12 @@
         },
         _initEvents: function () {
             this._on({
-                click: function () {
+                click: function (e) {
+                    var el = $(e.target);
+                    if (el.hasClass('x')) {
+                        el.parent().remove();
+                    }
+
                     this.input.focus();
                 }
             });
@@ -32,6 +37,7 @@
                     switch (e.keyCode) {
                         case $.ui.keyCode.ENTER:
                             this.addItem();
+                            this.input.val('');
                             break;
                     }
                 }
@@ -42,12 +48,15 @@
             console.log(str);
             str = $.trim(str);
             if (str == '') return;
-            $('<span>').addClass('item')
+            var item = $('<span>').addClass('item')
                 .html(str).insertBefore(this.input);
+            $('<a>').addClass('x')
+                .attr('href', 'javascript:;')
+                .html('x').appendTo(item);
         },
         updateInputWidth: function (e) {
-            this.W.html(this.input.val().replace(/ /gm, '&nbsp;'));
-            this.input.width(this.W.width());
+            this.w.html(this.input.val().replace(/ /gm, '&nbsp;'));
+            this.input.width(this.w.width() + 10);
         }
     });
 })(jQuery);
