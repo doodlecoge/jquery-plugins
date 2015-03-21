@@ -82,6 +82,8 @@
             elem.parent().parent().siblings('a')
                 .removeClass(this.cls.focus)
                 .addClass(this.cls.active);
+
+            this._trigger('focus', null, elem);
         },
         openMenu: function (elem) {
             var pzidx = elem.parent().css('z-index');

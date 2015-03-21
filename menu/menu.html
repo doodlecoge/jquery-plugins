@@ -16,6 +16,7 @@
 </head>
 <body>
 <div id="c">
+    <div id="msg">msg</div>
     <button id="btn">Button</button>
     <ul id="menu" tabindex="1">
         <li><a>Spring</a></li>
@@ -54,11 +55,21 @@
         }
     });
 
-    $("#menu").on("menuselect", function (e, elem) {
-        console.log(elem);
+    $("#menu").on("menufocus", function (e, elem) {
+        $('#msg').html($(elem).html());
     });
 
     $("#menu").menu('bindTo', $("#btn"), 'click');
+
+
+    $(function () {
+        $('#btn').click();
+        var i = 0;
+        var t = setInterval(function () {
+            if (i++ > 10) clearInterval(t);
+            $("#menu").menu('next');
+        }, 1000);
+    });
 
 </script>
 </body>
