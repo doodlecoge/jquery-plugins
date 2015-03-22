@@ -38,7 +38,7 @@
                 click: function (e) {
                     if ($(e.target).closest(this.element.find('.' + this.cls.menu)).length)
                         return;
-                    if (this.position && e.target == this.position.of.get(0))
+                    if (this.position && this.position.of && e.target == this.position.of.get(0))
                         return;
                     this.closeMenu();
                 }
