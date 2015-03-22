@@ -33,8 +33,14 @@
                 keyup: function (e) {
                     switch (e.keyCode) {
                         case $.ui.keyCode.ENTER:
-                            this.addItem();
+                            if (this.menu) {
+                                var a = this.menu.current.children('a');
+                                this.addItem(a.data('#') || a.html());
+                            } else {
+                                this.addItem();
+                            }
                             this.input.val('');
+                            this._updateInputWidth();
                             break;
                         case $.ui.keyCode.UP:
                             e.preventDefault();
@@ -54,33 +60,39 @@
                 }
             });
         },
-        addItem: function (str) {
-            str = str || this.input.val();
-            str = $.trim(str);
-            if (str == '') return;
-            var item = $('<span>').addClass('item')
-                .html(str).insertBefore(this.input);
-            $('<a>').addClass('x')
-                .attr('href', 'javascript:;')
-                .html('x').appendTo(item);
+        addItem: function (item) {
+            var txt = item || this.input.val();
+            if (typeof txt == 'object' && txt.text)
+                txt = txt.text;
+            txt = $.trim(txt);
+            if (txt == '') return;
+            var span = $('<span>').addClass('item')
+                .data('#', item || txt)
+                .html(txt).insertBefore(this.input);
+            $('<a>').addClass('x').attr('href', 'javascript:;')
+                .html('x').appendTo(span);
+            if (this.menu) this.menu.close();
         },
         _updateInputWidth: function () {
             this.w.html(this.input.val().replace(/ /gm, '&nbsp;'));
             this.input.width(this.w.width() + 10);
         },
         // data is an array of strings, or
-        // an array of objects each has a text attribute.
+        // an array of objects each has a text attribute, or
+        // a function that returns previous data.
         autocomplete: function (data) {
-            if (!$.isArray(data) || data.length == 0) {
-                this.menu = null;
-                return;
-            }
             this.source = data;
+            if (this.menu) return;
+
             var menu = $('<ul>').appendTo(this.element);
             var that = this;
             menu.on('menufocus', function (e, elem) {
                 that.input.val($(elem).html());
                 that._updateInputWidth();
+            });
+            menu.on('menuselect', function (e, elem) {
+                that.addItem($(elem).data('#') || $(elem).html());
+                that.input.val('');
             });
             this.menu = menu.menu().menu('instance');
             this.menu.bindTo(this.input);
@@ -93,26 +105,58 @@
                 return;
             }
             this.searching = this._delay(function () {
-                var reg = new RegExp(s);
-                this.menu.element.empty();
-                var menu = this.menu;
-                var source = $.map(this.source, function (item) {
-                    if (reg.test(item)) return item;
+                var called = false;
+                var source = this._getData(s, function (source) {
+                    if (called) return;
+                    called = true;
+                    this._renderMenuItems(source);
                 });
-
-                menu.current = null;
-
-                if (source.length == 0) {
-                    menu.close();
-                    return;
-                }
-
-                $.each(source, function (i, item) {
-                    $('<li><a>' + item + '</a></li>')
-                        .appendTo(menu.element);
-                });
-                this.menu.open();
+                if (source && !called) this._renderMenuItems(source);
             }, this.delay);
+        },
+        _getData: function (filter, callback) {
+            if ($.isArray(this.source)) {
+                var reg = new RegExp(filter);
+                var txt;
+                var source = $.map(this.source, function (item) {
+                    if (typeof item == 'string')
+                        txt = item;
+                    else if (typeof item == 'object' && item.text)
+                        txt = item.text;
+                    else return;
+                    if (reg.test(txt)) return item;
+                });
+                return source;
+            } else if (typeof this.source == 'function') {
+                var that = this;
+                this.source(filter, function (source) {
+                    callback.call(that, source);
+                });
+            }
+        },
+        _renderMenuItems: function (source) {
+            var menu = this.menu;
+            menu.current = null;
+            if (source.length == 0) {
+                menu.close();
+                return;
+            }
+            this.menu.element.empty();
+            var li, txt;
+            $.each(source, function (i, item) {
+                txt = item;
+                if (typeof txt == 'object' && txt.text)
+                    txt = txt.text;
+                li = $('<li>').appendTo(menu.element);
+                $('<a>').html(txt).appendTo(li).data('#', item);
+            });
+            this.menu.open();
+        },
+        getValues: function () {
+            return this.wrapper.children('.item').map(function () {
+                var el = $(this);
+                return el.data('#') || this.childNodes[0].nodeValue;
+            });
         }
     });
 })

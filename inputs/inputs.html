@@ -21,7 +21,10 @@
 <body>
 
 <div id="inputs"></div>
-
+<hr/>
+<button id="btn">Get Value</button>
+<hr/>
+<div id="values"></div>
 <hr/>
 
 <label>x</label>
@@ -29,6 +32,26 @@
 
 <script type="text/javascript">
     $(function () {
+        var source = [
+            {id: 1, text: 'c/c++'},
+            {id: 2, text: 'java'},
+            {id: 3, text: 'xml'},
+            {id: 4, text: 'javascript'},
+            {id: 5, text: 'spring'},
+            {id: 6, text: 'struts'},
+            {id: 7, text: 'hibernate'},
+            {id: 8, text: 'shell'},
+            {id: 9, text: 'html'},
+            {id: 10, text: 'html5'},
+            {id: 11, text: 'css'},
+            {id: 12, text: 'python'},
+            {id: 13, text: 'word'},
+            {id: 14, text: 'excel'},
+            {id: 15, text: 'perl'},
+            {id: 16, text: 'tcl'},
+            {id: 17, text: 'ruby'}
+        ];
+
         $("#inputs").inputs()
                 .inputs('addItem', 'java')
                 .inputs('addItem', 'spring')
@@ -37,11 +60,28 @@
                 .inputs('addItem', 'javascript')
                 .inputs('addItem', 'MicroSoft Word')
                 .inputs('addItem', 'Oracle')
-                .inputs('autocomplete', [
-                    'c/c++', 'java', 'xml', 'javascript', 'spring', 'struts',
-                    'hibernate', 'shell', 'html', 'html5', 'css', 'python',
-                    'word', 'excel', 'perl', 'tcl', 'ruby'])
+                .inputs('autocomplete', function (filter, cb) {
+                    setTimeout(function () {
+                        var reg = new RegExp(filter);
+                        var s = $.map(source, function (val) {
+                            var txt = val.text || val;
+                            if (reg.test(txt)) return val;
+                        });
+                        cb(s);
+                    }, 1);
+                })
         ;
+
+        $('#btn').click(function () {
+            $('#values').html('');
+            var vals = $("#inputs").inputs('getValues');
+            console.log(vals);
+            $.each(vals, function (i, val) {
+                $('<span style="margin: 0 10px">')
+                        .html(val && val.text || val)
+                        .appendTo($('#values'));
+            });
+        });
     });
 </script>
 </body>
