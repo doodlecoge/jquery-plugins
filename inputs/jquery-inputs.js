@@ -34,6 +34,7 @@
                     switch (e.keyCode) {
                         case $.ui.keyCode.ENTER:
                             if (this.menu) {
+                                if (!this.menu.current) return;
                                 var a = this.menu.current.children('a');
                                 this.addItem(a.data('#') || a.html());
                             } else {
@@ -44,12 +45,12 @@
                             break;
                         case $.ui.keyCode.UP:
                             e.preventDefault();
-                            if (this.menu)
+                            if (this.menu && this.menu.element.is(':visible'))
                                 this.menu.prev();
                             break;
                         case $.ui.keyCode.DOWN:
                             e.preventDefault();
-                            if (this.menu)
+                            if (this.menu && this.menu.element.is(':visible'))
                                 this.menu.next();
                             break;
                         default:
@@ -102,6 +103,7 @@
             var s = $.trim(this.input.val());
             if (s == '') {
                 this.menu.close();
+                this.menu.current = null;
                 return;
             }
             this.searching = this._delay(function () {
