@@ -61,16 +61,25 @@
                 .inputs('addItem', 'MicroSoft Word')
                 .inputs('addItem', 'Oracle')
                 .inputs('autocomplete', function (filter, cb) {
-                    setTimeout(function () {
+                    var r = Math.floor(Math.random() * 100);
+                    if (r > 50) {
+                        console.log('===delay===');
+                        setTimeout(function () {
+                            cb(foo(filter));
+                        }, 1);
+                    } else {
+                        console.log('===directly===');
+                        return foo(filter);
+                    }
+                    function foo(filter) {
                         var reg = new RegExp(filter);
                         var s = $.map(source, function (val) {
                             var txt = val.text || val;
                             if (reg.test(txt)) return val;
                         });
-                        cb(s);
-                    }, 1);
-                })
-        ;
+                        return s;
+                    }
+                });
 
         $('#btn').click(function () {
             $('#values').html('');

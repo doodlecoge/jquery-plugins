@@ -102,8 +102,10 @@
             clearTimeout(this.searching);
             var s = $.trim(this.input.val());
             if (s == '') {
-                this.menu.close();
-                this.menu.current = null;
+                if (this.menu) {
+                    this.menu.close();
+                    this.menu.current = null;
+                }
                 return;
             }
             this.searching = this._delay(function () {
@@ -131,9 +133,13 @@
                 return source;
             } else if (typeof this.source == 'function') {
                 var that = this;
-                this.source(filter, function (source) {
+                var called = false;
+                var source = this.source(filter, function (source) {
+                    if (called) return;
+                    called = true;
                     callback.call(that, source);
                 });
+                if (!called && source) return source;
             }
         },
         _renderMenuItems: function (source) {
