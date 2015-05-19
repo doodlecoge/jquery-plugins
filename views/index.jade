@@ -1,0 +1,8 @@
+doctype html
+html
+  head
+    title 'Jquery Plugins'
+  body
+    each file in files
+      - var link = '/html/' + file;
+      a(href=link)= file

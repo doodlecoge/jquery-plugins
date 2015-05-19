@@ -77,7 +77,7 @@
     top: -5px;
     z-index: 1000;
     cursor: col-resize;
-    background: url("img/handle-v.png") 2px 50% no-repeat;
+    background: url("../img/handle-v.png") 2px 50% no-repeat;
 }
 
 .split-win .wrapper .hh {
@@ -88,5 +88,5 @@
     margin-top: -3px;
     z-index: 1000;
     cursor: row-resize;
-    background: url("img/handle-h.png") 50% 2px no-repeat;
+    background: url("../img/handle-h.png") 50% 2px no-repeat;
 }
