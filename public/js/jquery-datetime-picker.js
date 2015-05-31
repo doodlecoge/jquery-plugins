@@ -16,10 +16,11 @@
             var touchpad = this.touchpad = $('<div>').addClass('touchpad')
                 .appendTo(spinner);
 
-            var cards = this.cards = $('<div>').addClass('cards')
+            var cards = this.cards = $('<table>').addClass('cards')
                 .appendTo(spinner);
             for (var i = 0; i < 9; i++) {
-                $('<div>').addClass('card').appendTo(cards);
+                var tr = $('<tr>').appendTo(cards);
+                $('<td>').addClass('card').appendTo(tr);
             }
             this._updateVal();
 
@@ -28,9 +29,6 @@
             for (var i = 0; i < 6; i++) {
                 $('<div>').addClass('line').appendTo(lines);
             }
-
-            this.top = -this.spinner.height();
-            this.ch = this.spinner.height() / 3;
         },
         _init: function () {
             this._on(this.touchpad, {
@@ -38,6 +36,8 @@
                     this.moving = true;
                     this.y = e.pageY;
                     this.ts = new Date();
+                    this.top = -this.spinner.height();
+                    this.ch = this.spinner.height() / 3;
                     return false;
                 },
                 'mousemove': function (e) {
@@ -65,7 +65,10 @@
             var lvl = Math.max(0, 4 - dt / 50);
             lvl = Math.round(lvl * Math.sqrt(lvl)) * n;
             n += lvl;
-            var speed = 300 / Math.max(1, Math.sqrt(lvl))
+            var speed = 300 / Math.max(1, Math.sqrt(lvl));
+
+
+            console.log(n,speed);
 
 
             this._move(n, dy > 0 ? 1 : -1, speed);
@@ -82,7 +85,7 @@
                 top: (this.top + x * this.ch * dir) + 'px'
             }, speed, easing, function () {
                 that.val += x * dir * -1;
-                that.cards.css('top', that.top + 'px');
+                that.cards.css('top', '-100%');
                 that._updateVal();
                 if (n > 0) that._move(n, dir, speed);
             });
