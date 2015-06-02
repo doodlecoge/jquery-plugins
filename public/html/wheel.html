@@ -82,9 +82,11 @@
 
                 var curr = this.getValue();
 
+                console.log(this.top, Math.abs(val - curr) * this.cardHeight);
+
                 this._scroll(
                         Math.abs(val - curr) * this.cardHeight,
-                        val > curr ? 1 : -1
+                        val > curr ? -1 : 1
                 );
             },
             _scroll: function (delta, dir) {
@@ -93,17 +95,17 @@
                 this.top += dir * dy;
                 var hTop = this.cardHeight * (this.size - 3) / 2;
 
-                console.log(this.top, delta)
-
                 if (this.top > 0) {
                     this.top -= hTop;
                     this.val = this.getValue();
                     this.updateView();
-                } else if (this.top < hTop * -1) {
+                } else if (this.top < hTop * -2) {
                     this.top += hTop;
                     this.val = this.getValue();
                     this.updateView();
                 }
+
+                console.log(this.val);
 
                 this.cards.style.top = this.top + 'px';
                 if (delta == 0)return;
@@ -118,13 +120,14 @@
                 var hTop = this.cardHeight * (this.size - 3) / 2;
                 var delta = this.cards.offsetTop + hTop;
                 var n = Math.floor(Math.abs(delta) / this.cardHeight + .5);
-                return this.val - n;
+                return this.val + n * (delta > 0 ? -1 : 1);
             },
             updateView: function () {
                 var tds = this.findByTagName(this.cards, 'td');
                 var diff = Math.floor(this.size / 2);
+                var x = this.val;
                 each(tds, function (td, i) {
-                    td.innerText = this.val + i - diff;
+                    td.innerText = x + i - diff;
                 });
             },
             findByTagName: function (element, tagName) {
@@ -132,7 +135,7 @@
                 var stack = [element], results = [];
                 var childNodes, i, el, c;
                 while (stack.length > 0) {
-                    el = stack.pop();
+                    el = stack.shift();
                     childNodes = el.childNodes;
                     for (i = 0; i < childNodes.length; i++) {
                         c = childNodes[i];
@@ -166,16 +169,20 @@
                 }
             }
         }
+
+        window.Wheel = Wheel;
     })(window, document, 'Wheel');
 
 
+    var w = new Wheel(document.body, {
+        value: 2015,
+        delta: 100,
+        step: 1
+    });
+
     setTimeout(function () {
-        new Wheel(document.body, {
-            value: 2015,
-            delta: 100,
-            step: 1
-        }).wheelTo(-20);
-    }, 1);
+        w.wheelTo(2000);
+    }, 1000);
 </script>
 </body>
 </html>
