@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Datetime Picker</title>
+
+    <script type="text/javascript"
+            src="../js/jquery-1.11.2.js"></script>
+    <script type="text/javascript"
+            src="../js/jquery-ui-core.js"></script>
+    <script type="text/javascript"
+            src="../js/hammer.js"></script>
+
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .wheel {
+            position: relative;
+            width: 100px;
+            height: 150px;
+            border: 5px solid #888;
+            margin: 150px;
+            overflow: hidden;
+        }
+
+        table.cards {
+            height: 500%;
+            width: 100%;
+            top: -200%;
+            position: absolute;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        td.card {
+            width: 100%;
+            text-align: center;
+            border: 0;
+            padding: 0;
+        }
+
+        table.cards tr:nth-child(2n) .card {
+            background: #e8e8e8;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+    (function (window, document, exportName, undefined) {
+        function Wheel(element, options) {
+            this.element = element;
+            this.options = options || {};
+            this.init();
+        }
+
+        Wheel.prototype = {
+            top: 0,
+            cardHeight: 0,
+            val: 2015,
+            size: 15,
+            init: function () {
+                var wheel = $('<div>').addClass('wheel').appendTo(this.element);
+                var cards = $('<table>').addClass('cards').appendTo(wheel);
+                for (var i = 0; i < 15; i++) {
+                    var tr = $('<tr>').appendTo(cards);
+                    $('<td>').addClass('card').html(this.options.value + i - 7).appendTo(tr);
+                }
+                this.cards = cards.get(0);
+            },
+            wheelTo: function (val) {
+                this.top = this.cards.offsetTop;
+                this.cardHeight = this.cards.clientHeight / this.size;
+
+                var curr = this.getValue();
+
+                this._scroll(
+                        Math.abs(val - curr) * this.cardHeight,
+                        val > curr ? 1 : -1
+                );
+            },
+            _scroll: function (delta, dir) {
+                var dy = Math.min(10, delta);
+                delta -= dy;
+                this.top += dir * dy;
+                var hTop = this.cardHeight * (this.size - 3) / 2;
+
+                console.log(this.top, delta)
+
+                if (this.top > 0) {
+                    this.top -= hTop;
+                    this.val = this.getValue();
+                    this.updateView();
+                } else if (this.top < hTop * -1) {
+                    this.top += hTop;
+                    this.val = this.getValue();
+                    this.updateView();
+                }
+
+                this.cards.style.top = this.top + 'px';
+                if (delta == 0)return;
+                var that = this;
+                setTimeout(function () {
+                    that._scroll(delta, dir);
+                }, 10);
+            },
+            finish: function () {
+            },
+            getValue: function () {
+                var hTop = this.cardHeight * (this.size - 3) / 2;
+                var delta = this.cards.offsetTop + hTop;
+                var n = Math.floor(Math.abs(delta) / this.cardHeight + .5);
+                return this.val - n;
+            },
+            updateView: function () {
+                var tds = this.findByTagName(this.cards, 'td');
+                var diff = Math.floor(this.size / 2);
+                each(tds, function (td, i) {
+                    td.innerText = this.val + i - diff;
+                });
+            },
+            findByTagName: function (element, tagName) {
+                tagName = tagName.toLowerCase();
+                var stack = [element], results = [];
+                var childNodes, i, el, c;
+                while (stack.length > 0) {
+                    el = stack.pop();
+                    childNodes = el.childNodes;
+                    for (i = 0; i < childNodes.length; i++) {
+                        c = childNodes[i];
+                        stack.push(c);
+                        if (c.nodeName.toLowerCase() === tagName)
+                            results.push(c);
+                    }
+                }
+                return results;
+            }
+        };
+
+        function each(obj, iterator, context) {
+            var i;
+
+            if (!obj) {
+                return;
+            }
+
+            if (obj.forEach) {
+                obj.forEach(iterator, context);
+            } else if (obj.length !== undefined) {
+                i = 0;
+                while (i < obj.length) {
+                    iterator.call(context, obj[i], i, obj);
+                    i++;
+                }
+            } else {
+                for (i in obj) {
+                    obj.hasOwnProperty(i) && iterator.call(context, obj[i], i, obj);
+                }
+            }
+        }
+    })(window, document, 'Wheel');
+
+
+    setTimeout(function () {
+        new Wheel(document.body, {
+            value: 2015,
+            delta: 100,
+            step: 1
+        }).wheelTo(-20);
+    }, 1);
+</script>
+</body>
+</html>
