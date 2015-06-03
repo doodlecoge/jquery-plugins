@@ -56,105 +56,142 @@
 
 <script type="text/javascript">
     (function (window, document, exportName, undefined) {
+        Math.easeInOutQuad = function (t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        };
+
         function Wheel(element, options) {
             this.element = element;
             this.options = options || {};
+            this.values = this.options.values;
+            this.index = Math.floor(this.values.length / 2);
             this.init();
         }
 
         Wheel.prototype = {
-            top: 0,
-            cardHeight: 0,
-            val: 2015,
             size: 15,
+            direction: null,
             init: function () {
-                var wheel = $('<div>').addClass('wheel').appendTo(this.element);
+                var wheel = document.createElement('div');
+                wheel.className = 'wheel';
+                this.element.appendChild(wheel);
+
+                //var wheel = $('<div>').addClass('wheel').appendTo(this.element);
                 var cards = $('<table>').addClass('cards').appendTo(wheel);
                 for (var i = 0; i < 15; i++) {
                     var tr = $('<tr>').appendTo(cards);
-                    $('<td>').addClass('card').html(this.options.value + i - 7).appendTo(tr);
+                    $('<td>').addClass('card').appendTo(tr);
                 }
                 this.cards = cards.get(0);
+                this.updateView();
             },
-            wheelTo: function (val) {
-                this.top = this.cards.offsetTop;
+            updateIndex: function (index) {
+                this.index = index;
+            },
+            updateValues: function (values) {
+                this.values = values;
+                this.index = this.index || 0;
+            },
+            wheelUp: function (val) {
+                // stop any previous wheeling
+                clearTimeout(this.timer);
+                this.timer = null;
+
+                // recalculate these values in case height change
+
                 this.cardHeight = this.cards.clientHeight / this.size;
+                this.top = this.cards.offsetTop;
+                // default half hidden height
+                this.HHH = this.cardHeight * (this.size - 3) / 2;
 
-                var curr = this.getValue();
+                var targetTop = val * -1 * this.cardHeight - this.HHH;
+                var delta = Math.abs(targetTop - this.cards.offsetTop);
+                var dir = targetTop < this.cards.offsetTop ? -1 : 1;
 
-                console.log(this.top, Math.abs(val - curr) * this.cardHeight);
-
-                this._scroll(
-                        Math.abs(val - curr) * this.cardHeight,
-                        val > curr ? -1 : 1
-                );
+//                console.log(delta, dir);
+//
+                if (val > 0) {
+                    this._scroll(0, delta, dir, true);
+                } else {
+                    this._scroll(0, delta, dir, true);
+                }
             },
-            _scroll: function (delta, dir) {
-                var dy = Math.min(10, delta);
-                delta -= dy;
+            _scroll: function (delta, total, dir, first) {
+                var dy = Math.floor(Math.pow(delta * 200 / total, .5)) + 1;
+                dy = Math.min(dy, total - delta);
+                console.log(dy);
+                delta += dy;
                 this.top += dir * dy;
-                var hTop = this.cardHeight * (this.size - 3) / 2;
 
                 if (this.top > 0) {
-                    this.top -= hTop;
-                    this.val = this.getValue();
+                    this.top -= this.HHH;
+                    this.index = this.getIndex();
                     this.updateView();
-                } else if (this.top < hTop * -2) {
-                    this.top += hTop;
-                    this.val = this.getValue();
+                } else if (this.top < this.HHH * -2) {
+                    this.top += this.HHH;
+                    this.index = this.getIndex();
                     this.updateView();
                 }
-
-                console.log(this.val);
 
                 this.cards.style.top = this.top + 'px';
-                if (delta == 0)return;
+
+                if (delta == total) {
+                    this._finish();
+                    return;
+                }
+
+                // stopped by another call
+                if (this.timer == null && !first) return;
+
                 var that = this;
-                setTimeout(function () {
-                    that._scroll(delta, dir);
+                this.timer = setTimeout(function () {
+                    that._scroll(delta, total, dir);
                 }, 10);
             },
-            finish: function () {
+            _finish: function () {
+                this.index = this.getIndex();
+                this.cards.style.top = -this.HHH + 'px';
+                this.updateView();
             },
-            getValue: function () {
-                var hTop = this.cardHeight * (this.size - 3) / 2;
-                var delta = this.cards.offsetTop + hTop;
+            getIndex: function () {
+                var delta = this.cards.offsetTop + this.HHH;
                 var n = Math.floor(Math.abs(delta) / this.cardHeight + .5);
-                return this.val + n * (delta > 0 ? -1 : 1);
+                return this.index + n * (delta > 0 ? -1 : 1);
             },
             updateView: function () {
-                var tds = this.findByTagName(this.cards, 'td');
+                var tds = findByTagName(this.cards, 'td');
                 var diff = Math.floor(this.size / 2);
-                var x = this.val;
+                var idx = this.index;
+                var arr = this.options.values;
                 each(tds, function (td, i) {
-                    td.innerText = x + i - diff;
+                    td.innerText = arr[(idx + i - diff) % arr.length];
                 });
-            },
-            findByTagName: function (element, tagName) {
-                tagName = tagName.toLowerCase();
-                var stack = [element], results = [];
-                var childNodes, i, el, c;
-                while (stack.length > 0) {
-                    el = stack.shift();
-                    childNodes = el.childNodes;
-                    for (i = 0; i < childNodes.length; i++) {
-                        c = childNodes[i];
-                        stack.push(c);
-                        if (c.nodeName.toLowerCase() === tagName)
-                            results.push(c);
-                    }
-                }
-                return results;
             }
         };
 
+        function findByTagName(element, tagName) {
+            tagName = tagName.toLowerCase();
+            var stack = [element], results = [];
+            var childNodes, i, el, c;
+            while (stack.length > 0) {
+                el = stack.shift();
+                childNodes = el.childNodes;
+                for (i = 0; i < childNodes.length; i++) {
+                    c = childNodes[i];
+                    stack.push(c);
+                    if (c.nodeName.toLowerCase() === tagName)
+                        results.push(c);
+                }
+            }
+            return results;
+        }
+
         function each(obj, iterator, context) {
             var i;
-
-            if (!obj) {
-                return;
-            }
-
+            if (!obj) return;
             if (obj.forEach) {
                 obj.forEach(iterator, context);
             } else if (obj.length !== undefined) {
@@ -174,14 +211,19 @@
     })(window, document, 'Wheel');
 
 
+    var years = [];
+    for (var i = 0; i < 100; i++) {
+        years.push(i + 2015 - 50);
+    }
+
     var w = new Wheel(document.body, {
-        value: 2015,
+        values: years,
         delta: 100,
         step: 1
     });
 
     setTimeout(function () {
-        w.wheelTo(2000);
+        w.wheelUp(10);
     }, 1000);
 </script>
 </body>
