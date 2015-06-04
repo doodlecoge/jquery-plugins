@@ -29,7 +29,6 @@
         }
 
         table.cards {
-            height: 500%;
             width: 100%;
             top: -200%;
             position: absolute;
@@ -48,7 +47,7 @@
         }
 
         table.cards tr:nth-child(2n) .card {
-            background: #e8e8e8;
+            /*background: #e8e8e8;*/
         }
     </style>
 </head>
@@ -56,13 +55,6 @@
 
 <script type="text/javascript">
     (function (window, document, exportName, undefined) {
-        Math.easeInOutQuad = function (t, b, c, d) {
-            t /= d / 2;
-            if (t < 1) return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        };
-
         function Wheel(element, options) {
             this.element = element;
             this.options = options || {};
@@ -81,6 +73,7 @@
 
                 //var wheel = $('<div>').addClass('wheel').appendTo(this.element);
                 var cards = $('<table>').addClass('cards').appendTo(wheel);
+                cards.css('height', (this.size * 100 / 3) + '%');
                 for (var i = 0; i < 15; i++) {
                     var tr = $('<tr>').appendTo(cards);
                     $('<td>').addClass('card').appendTo(tr);
@@ -98,7 +91,6 @@
             wheelUp: function (val) {
                 // stop any previous wheeling
                 clearTimeout(this.timer);
-                this.timer = null;
 
                 // recalculate these values in case height change
 
@@ -107,54 +99,45 @@
                 // default half hidden height
                 this.HHH = this.cardHeight * (this.size - 3) / 2;
 
-                var targetTop = val * -1 * this.cardHeight - this.HHH;
-                var delta = Math.abs(targetTop - this.cards.offsetTop);
-                var dir = targetTop < this.cards.offsetTop ? -1 : 1;
-
-//                console.log(delta, dir);
-//
-                if (val > 0) {
-                    this._scroll(0, delta, dir, true);
-                } else {
-                    this._scroll(0, delta, dir, true);
-                }
+                this._s(1, 50, 10);
             },
-            _scroll: function (delta, total, dir, first) {
-                var dy = Math.floor(Math.pow(delta * 200 / total, .5)) + 1;
-                dy = Math.min(dy, total - delta);
-                console.log(dy);
-                delta += dy;
-                this.top += dir * dy;
-
-                if (this.top > 0) {
-                    this.top -= this.HHH;
-                    this.index = this.getIndex();
-                    this.updateView();
-                } else if (this.top < this.HHH * -2) {
-                    this.top += this.HHH;
-                    this.index = this.getIndex();
-                    this.updateView();
-                }
-
-                this.cards.style.top = this.top + 'px';
-
-                if (delta == total) {
+            _s: function (i, n, speed) {
+                if (i > n) {
                     this._finish();
                     return;
                 }
-
-                // stopped by another call
-                if (this.timer == null && !first) return;
-
+                var percentage = 1 - EasingFunctions.linear(i / n);
+                if (i > n - 10) this.top += 1;
+                else this.top += speed * percentage;
+                this._updateTop(this.top);
                 var that = this;
                 this.timer = setTimeout(function () {
-                    that._scroll(delta, total, dir);
+                    that._s(i + 1, n, speed);
                 }, 10);
             },
+            _updateTop: function () {
+                var top = this.top;
+                if (top > 0) {
+                    this.index -= (this.size - 3) / 2;
+                    top -= this.HHH;
+                    this.updateView();
+                } else if (top < this.HHH * -2) {
+                    this.index += (this.size - 3) / 2;
+                    top += this.HHH;
+                    this.updateView();
+                }
+                this.cards.style.top = top + 'px';
+                this.top = top;
+            },
             _finish: function () {
-                this.index = this.getIndex();
-                this.cards.style.top = -this.HHH + 'px';
-                this.updateView();
+                var top = this.cards.offsetTop;
+                top = -1 * Math.floor((Math.abs(top) + this.cardHeight / 2) / this.cardHeight) * this.cardHeight;
+                var that = this;
+                $(this.cards).animate({top: top + 'px'}, 200, 'swing', function () {
+                    that.index = that.getIndex();
+                    that.cards.style.top = -that.HHH + 'px';
+                    that.updateView();
+                });
             },
             getIndex: function () {
                 var delta = this.cards.offsetTop + this.HHH;
@@ -206,6 +189,24 @@
                 }
             }
         }
+
+        // @formatter:off
+        EasingFunctions = {
+            linear: function (t) { return t },
+            easeInQuad: function (t) { return t*t },
+            easeOutQuad: function (t) { return t*(2-t) },
+            easeInOutQuad: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t },
+            easeInCubic: function (t) { return t*t*t },
+            easeOutCubic: function (t) { return (--t)*t*t+1 },
+            easeInOutCubic: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 },
+            easeInQuart: function (t) { return t*t*t*t },
+            easeOutQuart: function (t) { return 1-(--t)*t*t*t },
+            easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
+            easeInQuint: function (t) { return t*t*t*t*t },
+            easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
+            easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+        };
+        // @formatter:on
 
         window.Wheel = Wheel;
     })(window, document, 'Wheel');
