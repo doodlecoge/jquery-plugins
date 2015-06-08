@@ -24,7 +24,7 @@
             width: 100px;
             height: 150px;
             border: 5px solid #888;
-            margin: 150px;
+            margin: 50px;
             overflow: hidden;
         }
 
@@ -79,6 +79,8 @@
                     $('<td>').addClass('card').appendTo(tr);
                 }
                 this.cards = cards.get(0);
+                this.top = this.topSave = this.cards.offsetTop;
+                this.cardHeight = this.cards.clientHeight / this.size;
                 this.updateView();
             },
             updateIndex: function (index) {
@@ -88,69 +90,93 @@
                 this.values = values;
                 this.index = this.index || 0;
             },
-            wheelUp: function (val) {
+            wheelUp: function (distance, duration) {
                 // stop any previous wheeling
                 clearTimeout(this.timer);
+
+                duration = duration || 500;
 
                 // recalculate these values in case height change
 
                 this.cardHeight = this.cards.clientHeight / this.size;
                 this.top = this.cards.offsetTop;
+                this.topSave = this.top;
                 // default half hidden height
                 this.HHH = this.cardHeight * (this.size - 3) / 2;
 
-                this._s(1, 50, 10);
+                this._scrollOut(1, 50, distance);
             },
-            _s: function (i, n, speed) {
+            _scrollOut: function (i, n, distance) {
                 if (i > n) {
                     this._finish();
                     return;
                 }
-                var percentage = 1 - EasingFunctions.linear(i / n);
-                if (i > n - 10) this.top += 1;
-                else this.top += speed * percentage;
-                this._updateTop(this.top);
+                var p = EasingFunctions.easeOutQuad(i / n);
+                console.log(-this.top+ this.topSave + p * distance)
+                this._updateTop(this.top, this.topSave + p * distance);
                 var that = this;
                 this.timer = setTimeout(function () {
-                    that._s(i + 1, n, speed);
+                    that._scrollOut(i + 1, n, distance);
                 }, 10);
             },
-            _updateTop: function () {
-                var top = this.top;
-                if (top > 0) {
-                    this.index -= (this.size - 3) / 2;
-                    top -= this.HHH;
-                    this.updateView();
-                } else if (top < this.HHH * -2) {
-                    this.index += (this.size - 3) / 2;
-                    top += this.HHH;
-                    this.updateView();
+            _scrollIn: function (i, n, delta) {
+                if (i > n) return;
+                var p = EasingFunctions.easeInQuad(i / n);
+                this.cards.style.top = this.top + p * delta + 'px';
+                var that = this;
+                this.timer = setTimeout(function () {
+                    that._scrollIn(i + 1, n, delta);
+                }, 10);
+            },
+            _updateTop: function (top, newTop) {
+                var delta = newTop - top;
+                var offsetTop = this.cards.offsetTop;
+                offsetTop += delta;
+                var needUpdate = false;
+                if (offsetTop > 0) {
+                    offsetTop -= this.cardHeight * (this.size - 3);
+                    needUpdate = true;
+                } else if (offsetTop < -2 * this.HHH) {
+                    offsetTop += this.cardHeight * (this.size - 3);
+                    needUpdate = true;
                 }
-                this.cards.style.top = top + 'px';
-                this.top = top;
+
+                this.cards.style.top = offsetTop + 'px';
+                this.top = newTop;
+                if (needUpdate) this.updateView();
             },
             _finish: function () {
+                this.index = this.getIndex();
+
                 var top = this.cards.offsetTop;
-                top = -1 * Math.floor((Math.abs(top) + this.cardHeight / 2) / this.cardHeight) * this.cardHeight;
-                var that = this;
-                $(this.cards).animate({top: top + 'px'}, 200, 'swing', function () {
-                    that.index = that.getIndex();
-                    that.cards.style.top = -that.HHH + 'px';
-                    that.updateView();
-                });
+                var delta = top % this.cardHeight;
+                if (delta == 0)return;
+                this.top = top;
+                if (delta + this.cardHeight / 2 > 0) {
+                    this._scrollIn(1, 20, -delta);
+                } else {
+                    this._scrollIn(1, 20, -(this.cardHeight + delta));
+                }
             },
             getIndex: function () {
-                var delta = this.cards.offsetTop + this.HHH;
-                var n = Math.floor(Math.abs(delta) / this.cardHeight + .5);
-                return this.index + n * (delta > 0 ? -1 : 1);
+                var delta = Math.round(
+                        (this.top - this.topSave) / this.cardHeight);
+                console.log('index: ', this.index - delta, delta);
+                return this.index - delta;
             },
             updateView: function () {
+                console.log('update')
                 var tds = findByTagName(this.cards, 'td');
                 var diff = Math.floor(this.size / 2);
-                var idx = this.index;
                 var arr = this.options.values;
+                var idx = this.getIndex();
+                if (idx < 0) idx = idx % (arr.length + 1) + 50;
+
                 each(tds, function (td, i) {
-                    td.innerText = arr[(idx + i - diff) % arr.length];
+                    var x = idx + i - diff;
+                    if (x < 0) x = x % (arr.length + 1) + 50;
+                    else x = x % arr.length;
+                    td.innerText = arr[x];
                 });
             }
         };
@@ -219,12 +245,12 @@
 
     var w = new Wheel(document.body, {
         values: years,
-        delta: 100,
+        delta: 50,
         step: 1
     });
 
     setTimeout(function () {
-        w.wheelUp(10);
+        w.wheelUp(-130);
     }, 1000);
 </script>
 </body>

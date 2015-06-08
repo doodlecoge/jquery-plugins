@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../css/jquery-ui.css">
+    <script type="text/javascript"
+            src="../js/jquery-1.11.2.js"></script>
+    <script type="text/javascript"
+            src="../js/jquery-ui.js"></script>
+    <script type="text/javascript"
+            src="../js/hammer.js"></script>
+    <script type="text/javascript"
+            src="../js/highcharts.js"></script>
+    <style type="text/css">
+        body {
+            background: #aaa;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #box {
+            width: 200px;
+            height: 200px;
+            background: #555;
+            position: absolute;
+            margin: 0 auto;
+        }
+
+        #log {
+        }
+    </style>
+</head>
+<body>
+<div id="xxx"></div>
+
+<button id="start">Start</button>
+<script type="text/javascript">
+    // @formatter:off
+    EasingFunctions = {
+        linear: function (t) { return t },
+        easeInQuad: function (t) { return t*t },
+        easeOutQuad: function (t) { return t*(2-t) },
+        easeInOutQuad: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t },
+        easeInCubic: function (t) { return t*t*t },
+        easeOutCubic: function (t) { return (--t)*t*t+1 },
+        easeInOutCubic: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 },
+        easeInQuart: function (t) { return t*t*t*t },
+        easeOutQuart: function (t) { return 1-(--t)*t*t*t },
+        easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
+        easeInQuint: function (t) { return t*t*t*t*t },
+        easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
+        easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+    };
+    // @formatter:on
+    var box = document.getElementById('box');
+
+    var n = 50;
+    var lines = [];
+    $.each(EasingFunctions, function (name, easing) {
+        var arr = [];
+        for (var i = 1; i <= n; i++) {
+            var d = easing(i / n) - easing((i - 1) / n);
+            var p = easing(i/n);
+            arr.push(d * 100)
+        }
+        console.log(easing);
+        lines.push({name: name, data: arr});
+    });
+
+
+    var chart1; // 全局变量
+    $(document).ready(function () {
+        chart1 = new Highcharts.Chart({
+            chart: {
+                renderTo: 'xxx'
+            },
+            series: lines
+        });
+    });
+</script>
+</body>
+</html>
