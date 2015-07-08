@@ -25,8 +25,8 @@
         }
 
         #box {
-            width: 200px;
-            height: 200px;
+            width: 8px;
+            height: 100px;
             background: #555;
             position: absolute;
             margin: 0 auto;
@@ -39,6 +39,14 @@
 <body>
 <div id="xxx"></div>
 
+<div id="box"></div>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 <button id="start">Start</button>
 <script type="text/javascript">
     // @formatter:off
@@ -55,23 +63,13 @@
         easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
         easeInQuint: function (t) { return t*t*t*t*t },
         easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
-        easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+        easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t },
+        test: function(t) {
+            return t*t;
+        }
     };
     // @formatter:on
     var box = document.getElementById('box');
-
-    var n = 50;
-    var lines = [];
-    $.each(EasingFunctions, function (name, easing) {
-        var arr = [];
-        for (var i = 1; i <= n; i++) {
-            var d = easing(i / n) - easing((i - 1) / n);
-            var p = easing(i/n);
-            arr.push(d * 100)
-        }
-        console.log(easing);
-        lines.push({name: name, data: arr});
-    });
 
 
     var chart1; // 全局变量
@@ -80,9 +78,61 @@
             chart: {
                 renderTo: 'xxx'
             },
-            series: lines
+            series: getSerials()
+        });
+
+        $('#start').click(function () {
+            box.style.left = 0;
+            foo2(1, 10, 30, 30);
         });
     });
+
+
+    var box = document.getElementById('box');
+    function foo2(i, n, v, bak) {
+        box.style.left = box.offsetLeft + Math.abs(v) + 'px';
+
+        t = 10;
+        if (i > n) {
+            v = 2;
+            t=50
+        }
+        if (i > 5 * n)return;
+
+        console.log(i, n, v);
+
+        setTimeout(function () {
+            foo2(i + 1, n, v, bak);
+        }, t);
+    }
+
+    function foo(i, n, distance) {
+        if (i > n)return;
+        var p = EasingFunctions[easingName](i / n);
+        $('#box').css('left', (p * distance) + 'px');
+        setTimeout(function () {
+            foo(i + 1, n, distance)
+        }, 10);
+    }
+
+    var easingName = 'easeInOutQuint';
+    function getSerials() {
+        var n = 20;
+        var lines = [];
+        $.each(EasingFunctions, function (name, easing) {
+            if (name != easingName)return;
+            var arr = [];
+            for (var i = 1; i <= n; i++) {
+                var d = easing(i / n) - easing((i - 1) / n);
+                var p = easing(i / n);
+                arr.push(d * 100)
+            }
+            lines.push({name: name, data: arr});
+        });
+        return lines;
+    }
+
+
 </script>
 </body>
 </html>

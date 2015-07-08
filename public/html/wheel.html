@@ -23,15 +23,25 @@
             position: relative;
             width: 100px;
             height: 150px;
-            border: 5px solid #888;
+            border: 1px solid #888;
             margin: 50px;
             overflow: hidden;
         }
 
-        table.cards {
+        .wheel .pad {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 102;
+        }
+
+        .wheel table.cards {
             width: 100%;
             top: -200%;
             position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 101;
             padding: 0;
             margin: 0;
             border: 0;
@@ -39,15 +49,26 @@
             border-collapse: collapse;
         }
 
-        td.card {
+        .wheel table.cards td.card {
             width: 100%;
             text-align: center;
             border: 0;
             padding: 0;
         }
 
-        table.cards tr:nth-child(2n) .card {
-            /*background: #e8e8e8;*/
+        .wheel .lines {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .wheel .lines .line {
+            width: 100%;
+            height: 33.333333%;
+            border-bottom: 5px solid #69c;
         }
     </style>
 </head>
@@ -78,10 +99,32 @@
                     var tr = $('<tr>').appendTo(cards);
                     $('<td>').addClass('card').appendTo(tr);
                 }
+
+                var lines = $('<div>').addClass('lines').appendTo(wheel);
+                for (var i = 0; i < 2; i++) {
+                    $('<div>').addClass('line').appendTo(lines);
+                }
+
+                var pad = $('<div>').addClass('pad').appendTo(wheel).get(0);
+
+
                 this.cards = cards.get(0);
-                this.top = this.topSave = this.cards.offsetTop;
+                var top = this.top = this.topSave = this.cards.offsetTop;
                 this.cardHeight = this.cards.clientHeight / this.size;
                 this.updateView();
+
+
+                var mc = new Hammer.Manager(pad);
+                mc.add(new Hammer.Pan({
+                    direction: Hammer.DIRECTION_VERTICAL,
+                    threshold: 0
+                }));
+                mc.on("pan", function (e) {
+                    cards.get(0).style.top = (top + e.deltaY) + 'px';
+                    e.preventDefault();
+                });
+
+
             },
             updateIndex: function (index) {
                 this.index = index;
@@ -104,7 +147,7 @@
                 // default half hidden height
                 this.HHH = this.cardHeight * (this.size - 3) / 2;
 
-                this._scrollOut(1, 50, distance);
+                this._scrollOut(1, 300, distance);
             },
             _scrollOut: function (i, n, distance) {
                 if (i > n) {
@@ -112,20 +155,21 @@
                     return;
                 }
                 var p = EasingFunctions.easeOutQuad(i / n);
-                console.log(-this.top+ this.topSave + p * distance)
-                this._updateTop(this.top, this.topSave + p * distance);
+                console.log(-this.top + this.topSave + p * distance);
+                var x = p * distance;
+                this._updateTop(this.top, this.topSave + i*4);
                 var that = this;
                 this.timer = setTimeout(function () {
                     that._scrollOut(i + 1, n, distance);
                 }, 10);
             },
-            _scrollIn: function (i, n, delta) {
+            _scrollIn: function (i, n, delta, a) {
                 if (i > n) return;
                 var p = EasingFunctions.easeInQuad(i / n);
                 this.cards.style.top = this.top + p * delta + 'px';
                 var that = this;
                 this.timer = setTimeout(function () {
-                    that._scrollIn(i + 1, n, delta);
+                    that._scrollIn(i + 1, n, delta, a);
                 }, 10);
             },
             _updateTop: function (top, newTop) {
@@ -153,9 +197,9 @@
                 if (delta == 0)return;
                 this.top = top;
                 if (delta + this.cardHeight / 2 > 0) {
-                    this._scrollIn(1, 20, -delta);
+                    this._scrollIn(1, 50, -delta, 2);
                 } else {
-                    this._scrollIn(1, 20, -(this.cardHeight + delta));
+                    this._scrollIn(1, 50, -(this.cardHeight + delta), 2);
                 }
             },
             getIndex: function () {

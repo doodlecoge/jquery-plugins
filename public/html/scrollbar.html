@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <META content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>xxx</title>
+    <link rel="stylesheet" href="../css/jquery.scrollbar.css">
+    <script type="text/javascript" src="../js/jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui-core.js"></script>
+    <script type="text/javascript" src="../js/jquery.scrollbar.js"></script>
+    <style type="text/css">
+        .panel {
+            width: 300px;
+            height: 300px;
+            background: #eee;
+            position: relative;
+            overflow: hidden;
+            margin: 100px;
+        }
+
+        .content {
+            position: absolute;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+<div class="panel"></div>
+
+
+<script type="text/javascript">
+    for (var i = 0; i < 100; i++) {
+        $('<a>').html('hello world ' + i).appendTo('.panel');
+        $('<br/>').appendTo('.panel');
+    }
+
+
+    $('.panel').ScrollBar();
+</script>
+</body>
+</html>
